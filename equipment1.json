@@ -1,0 +1,16 @@
+{
+  "name": "dummy",
+  "address": "TCPIP0::192.168.1.3",
+  "idn": "dummy",
+  "timeout": 1000,
+  "param_1": {
+    "method": "set_lineedit",
+    "name": "Param 1:",
+    "command": "Param 1 String"
+  },
+  "param_2": {
+    "method": "set_lineedit",
+    "name": "Param 2:",
+    "command": "Param 2 String"
+  }
+}
