@@ -1,16 +1,68 @@
 {
-  "name": "dummy",
-  "address": "TCPIP0::192.168.1.3",
-  "idn": "dummy",
-  "timeout": 1000,
-  "param_1": {
-    "method": "set_lineedit",
-    "name": "Param 1:",
-    "command": "Param 1 String"
+  "equipment1": {
+    "address": "TCPIP0::192.168.1.1",
+    "idn": "dummy",
+    "timeout": 1000,
+    "idn_cmd": "*IDN?",
+    "func_volt_dc": {
+      "cmd": ":FUNC:VOLT:DC",
+      "mode": "w"
+    },
+    "func_volt_ac": {
+      "cmd": ":FUNC:VOLT:AC",
+      "mode": "w"
+    },
+    "meas_volt_dc": {
+      "cmd": ":MEAS:VOLT:DC",
+      "mode": "w"
+    }
   },
-  "param_2": {
-    "method": "set_lineedit",
-    "name": "Param 2:",
-    "command": "Param 2 String"
+  "equipment2": {
+    "address": "TCPIP0::192.168.1.2",
+    "idn": "dummy2",
+    "timeout": 1000,
+    "idn_cmd": "*IDN?",
+    "param_1": {
+      "method": "set_lineedit",
+      "name": "Param 1:",
+      "command": "Param 1 String"
+    },
+    "param_2": {
+      "method": "set_lineedit",
+      "name": "Param 2:",
+      "command": "Param 2 String"
+    }
+  },
+  "equipment3": {
+    "address": "TCPIP0::192.168.1.3",
+    "idn": "dummy",
+    "timeout": 1000,
+    "idn_cmd": "*IDN?",
+    "param_1": {
+      "method": "set_lineedit",
+      "name": "Param 1:",
+      "command": "Param 1 String"
+    },
+    "param_2": {
+      "method": "set_lineedit",
+      "name": "Param 2:",
+      "command": "Param 2 String"
+    }
+  },
+  "equipment4": {
+    "address": "TCPIP0::192.168.1.2",
+    "idn": "dummy",
+    "timeout": 1000,
+    "idn_cmd": "*IDN?",
+    "param_1": {
+      "method": "set_lineedit",
+      "name": "Param 1:",
+      "command": "Param 1 String"
+    },
+    "param_2": {
+      "method": "set_lineedit",
+      "name": "Param 2:",
+      "command": "Param 2 String"
+    }
   }
 }
