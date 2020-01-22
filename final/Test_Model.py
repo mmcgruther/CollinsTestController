@@ -17,7 +17,7 @@ class Test_Model(QtCore.QAbstractTableModel):
         }
     }
     """
-    def __init__(self, parent, data = None, header = ['Categories', 'Commands'], *args):
+    def __init__(self, parent, file = None, header = ['Categories', 'Commands'], *args):
         super(Test_Model, self).__init__()
         self.data = {}
         self.load_json("tests.json")
@@ -33,14 +33,12 @@ class Test_Model(QtCore.QAbstractTableModel):
         else:
             self.selectedEquipment = list(self.data[self.selectedTest])[0]
 
-    @QtCore.pyqtSlot(int)
     def slot_selected_test_changed(self, index):
         self.selectedTest = list(self.data)[index]
         self.default_equipment_select()
         self.update_row_offsets()
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
 
-    @QtCore.pyqtSlot(int)
     def slot_selected_equipment_changed(self, index):
         if index < 0:
             self.selectedEquipment = None
