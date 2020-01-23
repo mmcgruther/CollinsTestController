@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui
-import json, threading, Equipment_Model, Test_Model, Visa_Worker, IP_Table_Model
+from final import Equipment_Model, Test_Model, Visa_Worker, IP_Table_Model
+import json, threading
 
 class Controller_Model(QtCore.QObject):
    

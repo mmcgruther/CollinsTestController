@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox
-import IP_Table_Model, Controller_Model
-import sys, time, json, Visa_Worker
+from final import Controller_Model
+import sys, time, json
 
 class Main_Window(QMainWindow):
     def __init__(self):
@@ -74,10 +74,3 @@ class Main_Window(QMainWindow):
         self.equipment_combobox.clear()
         for equipment in equipment_list:
             self.equipment_combobox.addItem(equipment)
-
-
-
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    m = Main_Window()
-    sys.exit(app.exec_())

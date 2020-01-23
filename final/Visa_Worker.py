@@ -1,12 +1,12 @@
 #import pyvisa
 from PyQt5 import QtCore
 import sys, time, threading
-from Visa_Wrapper import Visa_Manager
+#from Visa_Wrapper import Visa_Manager
 
 class Visa_Worker(QtCore.QObject):
     def __init__(self, addr = None, *args, **kwargs):
         super(Visa_Worker, self).__init__()
-        self.rm = Visa_Manager(addr)
+        #self.rm = Visa_Manager(addr)
         self.addr = addr
         self.args = args
         self.kwargs = kwargs
@@ -54,6 +54,7 @@ class Visa_Worker(QtCore.QObject):
             print(threading.get_ident(), "Skipped write to", self.addr)
         else:
             print(threading.get_ident(), "Write to", self.addr, cmd)
+            time.sleep(1)
             self.signal_write_success.emit(self.addr)
     @QtCore.pyqtSlot()
     def slot_query(self):
