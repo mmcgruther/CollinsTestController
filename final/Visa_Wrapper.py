@@ -1,3 +1,5 @@
+import visa
+
 class Test_Command:
     def __init__(self, func, cmd, *args):
         self.cmd = cmd
@@ -9,17 +11,31 @@ class Test_Command:
         return cmd.format(test)
 
 
-class Visa_Manager:
+class Visa_Session:
     def __init__(self, addr):
         self.addr = addr
-    #   self.rm = visa.ResourceManager('@py')
-    #   self.device = self.rm.open_resource(self.addr)
-    
+        self.rm = visa.ResourceManager('@py')
+        
+    def connect(self):
+        self.device = self.rm.open_resource(self.addr)
+
     def query(self, cmd, *args):
-        return self.device.query(cmd)
+        response = None
+        try:
+            self.device.query(cmd)
+        except:
+            pass
+
+        return response
 
     def write(self, cmd, *args):
-        return self.device.write(cmd)
+        failure = False
+        try:
+            self.device.write(cmd)
+        except:
+            failure = True
+        
+        return failure
 
     def run_test_cmd(self, test_cmd):
         pass
