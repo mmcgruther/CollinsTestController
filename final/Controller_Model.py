@@ -80,21 +80,26 @@ class Controller_Model(QtCore.QObject):
        
     @QtCore.pyqtSlot(str, str)
     def slot_connected(self, addr, name):
-        if name == self.get_equipment_idn(addr):
+        #TODO: remove comment to check received vs expected idn
+        #if name == self.get_equipment_idn(addr):
+        if True:
             print(addr, ": Connected to ", name)
             self.set_connected(addr, 1)
             self.connection_response()
-        elif self.next_connection(addr):
-            self.connection_response()
         else:
-            print(addr, ": Incorrect ID", name, ", Reconnecting...")
+            print(addr, ": Incorrect IDN", name, ", expected",self.get_equipment_idn(addr))
+            if self.next_connection(addr):
+                self.connection_response()
+            else:
+                print(addr, ": Reconnecting...")      
         
     @QtCore.pyqtSlot(str)
     def slot_not_connected(self, addr):
+        print(addr, ": Query timeout")
         if self.next_connection(addr):
             self.connection_response()
         else:
-            print(addr, ": No connection response. Reconnecting...")
+            print(addr, ": Reconnecting...")
 
     @QtCore.pyqtSlot(str)
     def slot_write_success(self, addr):
