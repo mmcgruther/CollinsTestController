@@ -78,22 +78,59 @@ class Test_Model(QtCore.QAbstractTableModel):
     def get_num_config_commands(self, equipment):
         return len(self.data[self.selectedTest][equipment]['config'])
 
+    def get_num_run_commands(self, equipment):
+        return len(self.data[self.selectedTest][equipment]['run'])
+
+    def get_num_reset_commands(self, equipment):
+        return len(self.data[self.selectedTest][equipment]['reset'])
+
     def get_next_config_command(self, equipment):
+        cmd = None
+        cmd_type = None
         self.data[self.selectedTest][equipment]['index'] += 1
         valid_index = self.data[self.selectedTest][equipment]['index'] < self.get_num_config_commands(equipment)
         if valid_index:
             cmd_obj = self.data[self.selectedTest][equipment]['config'][self.data[self.selectedTest][equipment]['index']]
             cmd = self.get_cmd_string(cmd_obj)
+            cmd_type = self.get_cmd_type(cmd_obj)
         else:
             self.reset_index(equipment)
-            cmd = None
-        return cmd
+        return cmd, cmd_type
+
+    def get_next_run_command(self, equipment):
+        cmd = None
+        cmd_type = None
+        self.data[self.selectedTest][equipment]['index'] += 1
+        valid_index = self.data[self.selectedTest][equipment]['index'] < self.get_num_run_commands(equipment)
+        if valid_index:
+            cmd_obj = self.data[self.selectedTest][equipment]['run'][self.data[self.selectedTest][equipment]['index']]
+            cmd = self.get_cmd_string(cmd_obj)
+            cmd_type = self.get_cmd_type(cmd_obj)
+        else:
+            self.reset_index(equipment)
+        return cmd, cmd_type
+
+    def get_next_reset_command(self, equipment):
+        cmd = None
+        cmd_type = None
+        self.data[self.selectedTest][equipment]['index'] += 1
+        valid_index = self.data[self.selectedTest][equipment]['index'] < self.get_num_reset_commands(equipment)
+        if valid_index:
+            cmd_obj = self.data[self.selectedTest][equipment]['reset'][self.data[self.selectedTest][equipment]['index']]
+            cmd = self.get_cmd_string(cmd_obj)
+            cmd_type = self.get_cmd_type(cmd_obj)
+        else:
+            self.reset_index(equipment)
+        return cmd, cmd_type
 
     def get_indexed_command(self, equipment):
         pass
 
     def get_cmd_string(self, cmd_obj):
         return cmd_obj['cmd'].format(*cmd_obj['args'])
+
+    def get_cmd_type(self, cmd_obj):
+        return cmd_obj['type']
 
     def setData(self, data):
         self.data = data

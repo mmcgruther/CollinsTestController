@@ -48,8 +48,7 @@
                 {
                     "type": "q",
                     "cmd": "CURVE?",
-                    "args": [],
-                    "ret_val": "busy"
+                    "args": []
                 }
             ],
             "reset": [

@@ -33,7 +33,7 @@ class Main_Window(QMainWindow):
         self.abort_button.setEnabled(False)      
 
         self.ip_table_view = self.findChild(QTableView, 'ip_table_view')
-        self.ip_table_view.setModel(self.controller_model.ip_table_model)
+        self.ip_table_view.setModel(self.controller_model.get_IP_table_model())
 
         self.test_tableview = self.findChild(QTableView, 'test_tableview')
         self.test_tableview.setModel(self.controller_model.get_test_model())

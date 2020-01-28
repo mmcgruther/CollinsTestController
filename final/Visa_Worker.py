@@ -15,11 +15,13 @@ class Visa_Worker(QtCore.QObject):
 
     signal_connect = QtCore.pyqtSignal(str)
     signal_write = QtCore.pyqtSignal(str)
+    signal_query = QtCore.pyqtSignal(str)
     signal_connected = QtCore.pyqtSignal(str, str)
     signal_not_connected = QtCore.pyqtSignal(str)
     signal_start = QtCore.pyqtSignal()
+    signal_stop = QtCore.pyqtSignal()
     signal_write_success = QtCore.pyqtSignal(str)
-    signal_query_success = QtCore.pyqtSignal()
+    signal_query_success = QtCore.pyqtSignal(str, list)
     signal_error = QtCore.pyqtSignal()
 
     @QtCore.pyqtSlot(str)
@@ -61,6 +63,7 @@ class Visa_Worker(QtCore.QObject):
             self.signal_error.emit()
         elif not self.running:
             print(threading.get_ident(), "Skipped write to", self.addr)
+            self.signal_write_success.emit(self.addr)
         else:
             print(threading.get_ident(), "Write to", self.addr, cmd)
             time.sleep(1)
@@ -80,7 +83,8 @@ class Visa_Worker(QtCore.QObject):
             self.signal_error.emit()
         elif not self.running:
             print(threading.get_ident(), "Skipped query to", self.addr)
+            self.signal_query_success.emit(self.addr, [None])
         else:
             print(threading.get_ident(), "Query to", self.addr)
-            self.signal_write_success.emit()
+            self.signal_query_success.emit(self.addr, [123, 456])
             

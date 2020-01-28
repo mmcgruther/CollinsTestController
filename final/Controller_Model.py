@@ -59,10 +59,10 @@ class Controller_Model(QtCore.QObject):
                 return
         self.signal_set_refresh_button.emit(False)
         self.signal_set_execute_button.emit(False)
-        self.signal_set_abort_button.emit(False)
+        self.signal_set_abort_button.emit(True)
         self.signal_set_test_combobox.emit(False)
         self.signal_set_equipment_combobox.emit(False)
-
+        self.executionPhase = 'config'
         self.workersResponded = 0
         print("Main thread starting test", threading.get_ident())
 
@@ -73,7 +73,10 @@ class Controller_Model(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def abort_test(self):
-        pass    
+        self.signal_set_abort_button.emit(False)
+        print("Main thread aborting test", threading.get_ident())
+        for equipment in self.get_test_equipment():
+            self.get_worker(self.test_equipment_addr[equipment]).signal_stop.emit()
        
     @QtCore.pyqtSlot(str, str)
     def slot_connected(self, addr, name):
@@ -98,6 +101,12 @@ class Controller_Model(QtCore.QObject):
         equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
         self.next_command(equipment)
 
+    @QtCore.pyqtSlot(str, list)
+    def slot_query_success(self, addr, data):
+        print("Data received from", addr, ":", data)
+        equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
+        self.next_command(equipment)
+
     def next_connection(self, addr):
         self.set_connected(addr, 2)
         if not self.increment_equipment(addr):
@@ -109,13 +118,16 @@ class Controller_Model(QtCore.QObject):
             return True
 
     def next_command(self, equipment):
-        cmd = self.get_next_config_command(equipment)
+        cmd, cmd_type = self.get_next_command(equipment)
         if cmd is None:
             #Current phase complete, wait for other equipment
             self.test_response()
         else:
             addr = self.test_equipment_addr[equipment]
-            self.get_worker(addr).signal_write.emit(cmd)
+            if cmd_type == 'w':
+                self.get_worker(addr).signal_write.emit(cmd)
+            elif cmd_type == 'q':
+                self.get_worker(addr).signal_query.emit(cmd)
 
     def create_worker(self, addr):
         w = Visa_Worker.Visa_Worker(addr)
@@ -128,6 +140,9 @@ class Controller_Model(QtCore.QObject):
         w.signal_connected.connect(self.slot_connected)
         w.signal_not_connected.connect(self.slot_not_connected)
         w.signal_start.connect(w.slot_start)
+        w.signal_query.connect(w.slot_query)
+        w.signal_query_success.connect(self.slot_query_success)
+        w.signal_stop.connect(w.slot_stop)
 
         w.moveToThread(w.w_thread)
         return w
@@ -143,21 +158,41 @@ class Controller_Model(QtCore.QObject):
         """Tracks when worker threads have completed test phase"""
         self.workersResponded += 1
         if self.workersResponded == len(self.test_equipment_addr):
-            print("End of test execution")
+            print("End of", self.executionPhase, "phase")
 
-            self.signal_set_refresh_button.emit(True)
-            self.signal_set_execute_button.emit(True)
-            self.signal_set_abort_button.emit(False)
-            self.signal_set_test_combobox.emit(True)
-            self.signal_set_equipment_combobox.emit(True)
+            if self.executionPhase == 'config':
+                self.executionPhase = 'run'
+                self.workersResponded = 0
+                print("Starting run phase")
 
+                for equipment in self.get_test_equipment():
+                    self.next_command(equipment)
+            elif self.executionPhase == 'run':
+                self.executionPhase = 'reset'
+                self.workersResponded = 0
+                print("Starting reset phase")
 
+                for equipment in self.get_test_equipment():
+                    self.next_command(equipment)
+            elif self.executionPhase == 'reset':
+                print("End of test")
+                self.end_test()
+
+    def end_test(self):
+        self.signal_set_refresh_button.emit(True)
+        self.signal_set_execute_button.emit(True)
+        self.signal_set_abort_button.emit(False)
+        self.signal_set_test_combobox.emit(True)
+        self.signal_set_equipment_combobox.emit(True)
 
     def get_IP_table_data(self):
         return self.equipment_model.get_IP_table_data()
 
     def get_test_model(self):
         return self.test_model
+
+    def get_IP_table_model(self):
+        return self.ip_table_model
 
     def get_tests(self):
         return self.test_model.get_tests()
@@ -200,5 +235,14 @@ class Controller_Model(QtCore.QObject):
     def increment_equipment(self, addr):
         return self.equipment_model.increment_equipment(addr)
 
-    def get_next_config_command(self, equipment):
-        return self.test_model.get_next_config_command(equipment)
+    def get_next_command(self, equipment):
+        if self.executionPhase is None:
+            pass
+        elif self.executionPhase == 'config':
+            return self.test_model.get_next_config_command(equipment)
+        elif self.executionPhase == 'run':
+            return self.test_model.get_next_run_command(equipment)
+        elif self.executionPhase == 'reset':
+            return self.test_model.get_next_reset_command(equipment)
+        else:
+            pass
