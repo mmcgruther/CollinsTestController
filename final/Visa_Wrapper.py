@@ -14,18 +14,14 @@ class Test_Command:
 class Visa_Session:
     def __init__(self, addr):
         self.addr = addr
-        self.rm = visa.ResourceManager('@py')
+        self.rm = visa.ResourceManager('simulated_devices.yaml@sim')
         
     def connect(self):
-        self.device = self.rm.open_resource(self.addr)
+        self.device = self.rm.open_resource(self.addr, write_termination='\n', read_termination='\n')
 
     def query(self, cmd, *args):
         response = None
-        try:
-            self.device.query(cmd)
-        except:
-            pass
-
+        response = self.device.query(cmd)
         return response
 
     def write(self, cmd, *args):
@@ -34,7 +30,7 @@ class Visa_Session:
             self.device.write(cmd)
         except:
             failure = True
-        
+            print("Write failure")
         return failure
 
     def run_test_cmd(self, test_cmd):

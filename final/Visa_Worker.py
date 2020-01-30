@@ -28,6 +28,7 @@ class Visa_Worker(QtCore.QObject):
     def slot_connect(self, cmd):
         print(threading.get_ident(), "Connecting to", self.addr)
         #TODO Remove sleeps, IP conditional
+        """
         if self.addr == "TCPIP0::192.168.1.3":
             time.sleep(1)
             self.connected = False
@@ -38,13 +39,13 @@ class Visa_Worker(QtCore.QObject):
             self.signal_connected.emit(self.addr, "dummy")
             """
             
-            self.session.connect()
-            response = self.session.query(cmd)
-            if response is not None:
-                self.signal_connected.emit(self.addr, response)
-            else:
-                self.signal_not_connected.emit(self.addr)
-            """
+        self.session.connect()
+        response = self.session.query(cmd)
+        if response is not None:
+            self.signal_connected.emit(self.addr, response)
+        else:
+            self.signal_not_connected.emit(self.addr)
+            
     @QtCore.pyqtSlot()
     def slot_start(self):
         self.running = True

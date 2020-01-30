@@ -80,9 +80,7 @@ class Controller_Model(QtCore.QObject):
        
     @QtCore.pyqtSlot(str, str)
     def slot_connected(self, addr, name):
-        #TODO: remove comment to check received vs expected idn
-        #if name == self.get_equipment_idn(addr):
-        if True:
+        if name == self.get_equipment_idn(addr):
             print(addr, ": Connected to ", name)
             self.set_connected(addr, 1)
             self.connection_response()
@@ -115,7 +113,8 @@ class Controller_Model(QtCore.QObject):
     def next_connection(self, addr):
         self.set_connected(addr, 2)
         if not self.increment_equipment(addr):
-            self.get_worker(addr).signal_connect.emit(addr)
+            self.equipment_model.get_equipment_idn_cmd(addr)
+            self.get_worker(addr).signal_connect.emit(self.equipment_model.get_equipment_idn_cmd(addr))
             return False
         else:
             print(addr, ": No connection found")

@@ -67,6 +67,9 @@ class Equipment_Model:
     def get_equipment_idn(self, addr):
         return self.data[addr]['equipment'][self.data[addr]['index']]['idn']
 
+    def get_equipment_idn_cmd(self, addr):
+        return self.data[addr]['equipment'][self.data[addr]['index']]['idn_cmd']
+
     def get_connected(self, addr):
         return self.data[addr]['connected']
 
