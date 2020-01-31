@@ -3,7 +3,8 @@ import visa
 class Visa_Session:
     def __init__(self, addr):
         self.addr = addr
-        self.rm = visa.ResourceManager('simulated_devices.yaml@sim')
+        #self.rm = visa.ResourceManager('simulated_devices.yaml@sim')
+        self.rm = visa.ResourceManager('@py')
         
     def connect(self):
         self.device = self.rm.open_resource(self.addr, write_termination='\n', read_termination='\n')

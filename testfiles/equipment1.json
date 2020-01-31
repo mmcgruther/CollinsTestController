@@ -18,8 +18,8 @@
     }
   },
   "equipment2": {
-    "address": "TCPIP0::192.168.1.2::INSTR",
-    "idn": "TEKTRONIX,DPO3034,C013408,CF:91.1CT FV:v2.23 ",
+    "address": "TCPIP::192.168.1.2::10001::SOCKET",
+    "idn": "TEK/DPO3034,CF:91.1CT,FV:v1.0000",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
     "param_1": {
