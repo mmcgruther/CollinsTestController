@@ -1,6 +1,8 @@
-from PyQt5 import QtCore, uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox
+from PyQt5 import QtCore, uic, QtGui
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene
 from final import Controller_Model
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 import sys, time, json
 
 class Main_Window(QMainWindow):
@@ -46,6 +48,16 @@ class Main_Window(QMainWindow):
         self.equipment_combobox = self.findChild(QComboBox, 'equipment_combobox')
         self.test_combobox.currentIndexChanged.emit(0)
         self.equipment_combobox.currentIndexChanged.connect(self.controller_model.slot_selected_equipment_changed)
+
+        self.graphics_view = self.findChild(QGraphicsView, 'graphics_view')
+        figure = Figure()
+        axes = figure.gca()
+        axes.set_title("title")
+        canvas = FigureCanvas(figure)
+        scene = QGraphicsScene(self.graphics_view)
+        scene.addWidget(canvas)
+        self.graphics_view.setScene(scene)
+        #self.graphics_view.fitInView(0,0,50,50, QtCore.Qt.KeepAspectRatio)
 
         self.show()
 
