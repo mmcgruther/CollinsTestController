@@ -41,13 +41,7 @@
             "run": [
                 {
                     "type": "q",
-                    "cmd": "BUSY?",
-                    "args": [],
-                    "ret_val": "busy"
-                },
-                {
-                    "type": "q",
-                    "cmd": "CURVE?",
+                    "cmd": ":VOLT:IMM:AMPL?",
                     "args": []
                 }
             ],
@@ -93,13 +87,7 @@
             "run": [
                 {
                     "type": "q",
-                    "cmd": "BUSY?",
-                    "args": [],
-                    "ret_val": "busy"
-                },
-                {
-                    "type": "q",
-                    "cmd": "CURVE?",
+                    "cmd": ":VOLT:IMM:AMPL?",
                     "args": [],
                     "ret_val": "busy"
                 }

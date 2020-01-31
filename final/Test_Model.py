@@ -60,11 +60,11 @@ class Test_Model(QtCore.QAbstractTableModel):
             self.row_offsets.append(current_offset)
 
     def load_json(self, file):
-        infile = open(file, 'r')
-        self.data = json.load(infile)
-        for test in self.get_tests():
-            for equipment in self.data[test]:
-                self.data[test][equipment]['index'] = -1
+        with open(file, 'r') as infile:
+            self.data = json.load(infile)
+            for test in self.get_tests():
+                for equipment in self.data[test]:
+                    self.data[test][equipment]['index'] = -1
 
     def reset_index(self, equipment):
         self.data[self.selectedTest][equipment]['index'] = -1

@@ -104,10 +104,17 @@ class Controller_Model(QtCore.QObject):
         equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
         self.next_command(equipment)
 
-    @QtCore.pyqtSlot(str, list)
+    @QtCore.pyqtSlot(str, str)
     def slot_query_success(self, addr, data):
-        print("Data received from", addr, ":", data)
+        print("Data received from", addr, "type:", type(data), "data:", data)
         equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
+        self.next_command(equipment)
+
+    @QtCore.pyqtSlot(str, str)
+    def slot_error(self, addr, cmd):
+        print("Error from:", addr, "with command:", cmd)
+        equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
+        self.abort_test()
         self.next_command(equipment)
 
     def next_connection(self, addr):
@@ -147,6 +154,7 @@ class Controller_Model(QtCore.QObject):
         w.signal_query.connect(w.slot_query)
         w.signal_query_success.connect(self.slot_query_success)
         w.signal_stop.connect(w.slot_stop)
+        w.signal_error.connect(self.slot_error)
 
         w.moveToThread(w.w_thread)
         return w
@@ -250,3 +258,7 @@ class Controller_Model(QtCore.QObject):
             return self.test_model.get_next_reset_command(equipment)
         else:
             pass
+    def __del__(self):
+        if self.workersInit:  
+            for addr in self.get_addr_list():
+                self.get_worker(addr).w_thread.terminate()

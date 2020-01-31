@@ -19,14 +19,14 @@ class Equipment_Model:
             self.load_json(file)
 
     def load_json(self, file):
-        infile = open(file, 'r')
-        json_obj = json.load(infile)
-        for item in json_obj:
-            address = json_obj[item]['address']
-            if address not in self.data:
-                self.data[address] = { 'index': -1, 'connected': 0, 'equipment': [], 'names': []}
-            self.data[address]['equipment'].append(json_obj[item])
-            self.data[address]['names'].append(item)
+        with open(file, 'r') as infile:
+            json_obj = json.load(infile)
+            for item in json_obj:
+                address = json_obj[item]['address']
+                if address not in self.data:
+                    self.data[address] = { 'index': -1, 'connected': 0, 'equipment': [], 'names': []}
+                self.data[address]['equipment'].append(json_obj[item])
+                self.data[address]['names'].append(item)
 
     def get_equipment_address(self, equipment_name):
         for addr in self.data:

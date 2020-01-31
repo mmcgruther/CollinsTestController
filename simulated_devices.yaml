@@ -17,12 +17,9 @@ devices:
       GPIB INSTR:
         q: "\n"
         r: "\n"
-    error: ERROR
     dialogues:
       - q: "*IDN?"
         r: "TEKTRONIX, DMM4050, nnnnnnnm, mm/dd/yy tt:tt"
-      - q: "!CAL"
-        r: OK
     properties:
       frequency:
         default: 100.0
@@ -36,6 +33,17 @@ devices:
         specs:
           min: 1
           max: 100000
+          type: float
+      voltage:
+        default: 1.0
+        getter:
+          q: ":VOLT:IMM:AMPL?"
+          r: "{:+.8E}"
+        setter:
+          q: ":VOLT:IMM:AMPL {:.3f}"
+        specs:
+          min: 1
+          max: 6
           type: float
       amplitude:
         default: 1.0
