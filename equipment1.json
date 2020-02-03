@@ -1,7 +1,7 @@
 {
-  "equipment1": {
-    "address": "TCPIP::192.168.1.1::10001::SOCKET",
-    "idn": "TEKTRONIX, DMM4050, nnnnnnnm, mm/dd/yy tt:tt",
+  "function generator": {
+    "address": "TCPIP0::192.168.1.21::INSTR",
+    "idn": "Rigol Technologies,DG4162,DG4C151300243,00.01.04",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
     "func_volt_dc": {
@@ -17,8 +17,8 @@
       "mode": "w"
     }
   },
-  "equipment2": {
-    "address": "TCPIP0::192.168.1.2::INSTR",
+  "oscilloscope": {
+    "address": "TCPIP0::192.168.1.20::INSTR",
     "idn": "TEKTRONIX,DPO3034,C013408,CF:91.1CT FV:v2.23 ",
     "timeout": 1000,
     "idn_cmd": "*IDN?",

@@ -39,14 +39,19 @@ class Visa_Worker(QtCore.QObject):
             self.signal_connected.emit(self.addr, "dummy")
             """
             
-        self.session.connect()
-        response = self.session.query(cmd)
-        if response is not None:
-            self.connected = True
-            self.signal_connected.emit(self.addr, response)
-        else:
+        if self.session.connect():
+            print(threading.get_ident(), "Connection failure", self.addr)
             self.connected = False
             self.signal_not_connected.emit(self.addr)
+        else:    
+            response = self.session.query(cmd)
+            if response is not None:
+                self.connected = True
+                self.signal_connected.emit(self.addr, response)
+            else:
+                print(threading.get_ident(), "No response", self.addr)
+                self.connected = False
+                self.signal_not_connected.emit(self.addr)
             
     @QtCore.pyqtSlot()
     def slot_start(self):
@@ -72,7 +77,7 @@ class Visa_Worker(QtCore.QObject):
             print(threading.get_ident(), "Write to", self.addr, cmd)
             if self.session.write(cmd):
                 self.signal_error.emit(self.addr, cmd)
-                print("Write failure:", addr)
+                print(threading.get_ident(), "Write failure", addr)
             else:
                 self.signal_write_success.emit(self.addr)
 
@@ -90,7 +95,7 @@ class Visa_Worker(QtCore.QObject):
             response = self.session.query(cmd)
             if response is None:
                 self.signal_error.emit(self.addr, cmd)
-                print("Query failure:", self.addr)
+                print(threading.get_ident(), "Query failure", self.addr)
             else:
                 self.signal_query_success.emit(self.addr, response)
             

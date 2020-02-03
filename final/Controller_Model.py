@@ -93,7 +93,6 @@ class Controller_Model(QtCore.QObject):
         
     @QtCore.pyqtSlot(str)
     def slot_not_connected(self, addr):
-        print(addr, ": Query timeout")
         if self.next_connection(addr):
             self.connection_response()
         else:

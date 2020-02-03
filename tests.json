@@ -1,6 +1,6 @@
 {
     "test1": {
-        "equipment2": {
+        "oscilloscope": {
             "config": [
                 {
                     "type": "w",
@@ -59,7 +59,62 @@
                     "args": []
                 }
             ]
-        }
+        },
+	"function generator": {
+            "config": [
+                {
+                    "type": "w",
+                    "cmd": ":OUTPUT {0}",
+                    "args": [
+                        "OFF"
+                    ]
+		},
+		{
+                    "type": "w",
+                    "cmd": ":VOLT {0}",
+                    "args": [
+                        "5"
+                    ]
+                },
+                {
+                    "type": "w",
+                    "cmd": ":VOLT:OFFSet {0}",
+                    "args": [
+                        "1"
+                    ]
+                },
+                {
+                    "type": "w",
+                    "cmd": ":FREQ {0}",
+                    "args": [
+                        "1000000"
+                    ]
+                },
+                {
+                    "type": "w",
+                    "cmd": ":PHASe {0}",
+                    "args": [
+                        "90"
+                    ]
+                },
+                {
+                    "type": "w",
+                    "cmd": ":OUTPUT {0}",
+                    "args": [
+                        "ON"
+                    ]
+		}
+            ],
+            "run": [
+            ],
+            "reset": [
+                {
+                    "type": "w",
+                    "cmd": "*RST",
+                    "args": []
+		}
+	    ]
+	}
     },
     "test2": {
     }
