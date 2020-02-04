@@ -4,11 +4,12 @@ import json, threading
 
 class Controller_Model(QtCore.QObject):
    
-    def __init__(self, parent, equipment_file=None, test_file=None):
+    def __init__(self, parent, equipment_file, tests_file, backend):
         super(Controller_Model, self).__init__()
-        self.equipment_model = Equipment_Model.Equipment_Model("equipment1.json")
-        self.test_model = Test_Model.Test_Model(self)
+        self.equipment_model = Equipment_Model.Equipment_Model(equipment_file)
+        self.test_model = Test_Model.Test_Model(self, tests_file)
         self.ip_table_model = IP_Table_Model.IP_Table_Model(self, self.get_IP_table_data())
+        self.backend = backend
         self.workersInit = False
 
     signal_set_refresh_button = QtCore.pyqtSignal(bool)
@@ -140,7 +141,7 @@ class Controller_Model(QtCore.QObject):
                 self.get_worker(addr).signal_query.emit(cmd)
 
     def create_worker(self, addr):
-        w = Visa_Worker.Visa_Worker(addr)
+        w = Visa_Worker.Visa_Worker(addr, self.backend)
         w.w_thread = QtCore.QThread()
         w.w_thread.start()
 

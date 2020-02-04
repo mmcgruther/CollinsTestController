@@ -6,8 +6,8 @@ class Equipment_Model:
     {
         addr:
         {
-            --index: -1
-            --connected: 0
+            index: -1
+            connected: 0
             names: [...]
             equipment: [...]
         }

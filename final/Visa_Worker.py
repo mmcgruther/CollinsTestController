@@ -4,9 +4,9 @@ import sys, time, threading
 from final.Visa_Wrapper import Visa_Session
 
 class Visa_Worker(QtCore.QObject):
-    def __init__(self, addr = None, *args, **kwargs):
+    def __init__(self, addr, backend, *args, **kwargs):
         super(Visa_Worker, self).__init__()
-        self.session = Visa_Session(addr)
+        self.session = Visa_Session(addr, backend)
         self.addr = addr
         self.args = args
         self.kwargs = kwargs
@@ -27,17 +27,6 @@ class Visa_Worker(QtCore.QObject):
     @QtCore.pyqtSlot(str)
     def slot_connect(self, cmd):
         print(threading.get_ident(), "Connecting to", self.addr)
-        #TODO Remove sleeps, IP conditional
-        """
-        if self.addr == "TCPIP0::192.168.1.3":
-            time.sleep(1)
-            self.connected = False
-            self.signal_not_connected.emit(self.addr)
-        else:
-            time.sleep(0.5)
-            self.connected = True
-            self.signal_connected.emit(self.addr, "dummy")
-            """
             
         if self.session.connect():
             print(threading.get_ident(), "Connection failure", self.addr)

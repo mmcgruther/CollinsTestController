@@ -1,10 +1,9 @@
 import visa
 
 class Visa_Session:
-    def __init__(self, addr):
+    def __init__(self, addr, backend):
         self.addr = addr
-        #self.rm = visa.ResourceManager('simulated_devices.yaml@sim')
-        self.rm = visa.ResourceManager('@py')
+        self.rm = visa.ResourceManager(backend)
         
     def connect(self):
         failure = False

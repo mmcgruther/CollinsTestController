@@ -6,9 +6,9 @@ from matplotlib.figure import Figure
 import sys, time, json
 
 class Main_Window(QMainWindow):
-    def __init__(self):
+    def __init__(self, equipment_file = "equipment.json", tests_file = "tests.json", backend = "@py"):
         super(Main_Window, self).__init__()
-        self.controller_model = Controller_Model.Controller_Model(self)
+        self.controller_model = Controller_Model.Controller_Model(self, equipment_file, tests_file, backend)
 
         self.controller_model.signal_set_refresh_button.connect(self.slot_set_refresh_button)
         self.controller_model.signal_set_execute_button.connect(self.slot_set_execute_button)
@@ -57,8 +57,6 @@ class Main_Window(QMainWindow):
         scene = QGraphicsScene(self.graphics_view)
         scene.addWidget(canvas)
         self.graphics_view.setScene(scene)
-        #self.graphics_view.fitInView(0,0,50,50, QtCore.Qt.KeepAspectRatio)
-
         self.show()
 
     @QtCore.pyqtSlot(bool)

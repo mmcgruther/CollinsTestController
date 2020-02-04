@@ -17,10 +17,10 @@ class Test_Model(QtCore.QAbstractTableModel):
         }
     }
     """
-    def __init__(self, parent, file = None, header = ['Categories', 'Commands'], *args):
+    def __init__(self, parent, file, header = ['Categories', 'Commands'], *args):
         super(Test_Model, self).__init__()
         self.data = {}
-        self.load_json("tests.json")
+        self.load_json(file)
         self.header = header
         self.selectedTest = list(self.data)[0]
         self.selectedEquipment = None
