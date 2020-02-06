@@ -196,6 +196,10 @@ class Controller_Model(QtCore.QObject):
         self.signal_set_abort_button.emit(False)
         self.signal_set_test_combobox.emit(True)
         self.signal_set_equipment_combobox.emit(True)
+    
+    def set_pin_filename(self, filename):
+        self.pin_filename = filename
+        print(self.pin_filename)
 
     def get_IP_table_data(self):
         return self.equipment_model.get_IP_table_data()

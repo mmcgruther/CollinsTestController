@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog
 from final import Controller_Model
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -59,6 +59,9 @@ class Main_Window(QMainWindow):
         self.graphics_view.setScene(scene)
         self.show()
 
+        self.pin_button = self.findChild(QPushButton, 'pin_button')
+        self.pin_button.clicked.connect(self.slot_open_pin_dialog)
+
     @QtCore.pyqtSlot(bool)
     def slot_set_refresh_button(self, state):
         self.refresh_button.setEnabled(state)
@@ -84,3 +87,7 @@ class Main_Window(QMainWindow):
         self.equipment_combobox.clear()
         for equipment in equipment_list:
             self.equipment_combobox.addItem(equipment)
+
+    @QtCore.pyqtSlot()
+    def slot_open_pin_dialog(self):
+        self.controller_model.set_pin_filename(QFileDialog.getOpenFileName(self,"Open file","~","CSV File (*.csv)"))
