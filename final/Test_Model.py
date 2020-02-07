@@ -5,19 +5,10 @@ class Test_Model(QtCore.QAbstractTableModel):
     """
     data:
     {
-        test:
-        {
-            equipment:
-            {
-                config: [...],
-                run: [...],
-                reset: [...]
-                index: -1
-            }
-        }
+        'test_name': Test_Object
     }
     """
-    def __init__(self, parent, file, header = ['Categories', 'Commands'], *args):
+    def __init__(self, parent, file, header = ['Categories', 'Commands','Parameter 1','Parameter 2','Parameter 3'], *args):
         super(Test_Model, self).__init__()
         self.data = {}
         self.load_json(file)
@@ -52,19 +43,19 @@ class Test_Model(QtCore.QAbstractTableModel):
         current_offset = 1
         self.row_offsets.append(current_offset)
         if self.selectedEquipment is not None:
-            current_offset += len(self.data[self.selectedTest][self.selectedEquipment]['config']) + 1
+            current_offset += len(self.get_selected_equipment()['config']) + 1
             self.row_offsets.append(current_offset)
-            current_offset += len(self.data[self.selectedTest][self.selectedEquipment]['run']) + 1
+            current_offset += len(self.get_selected_equipment()['run']) + 1
             self.row_offsets.append(current_offset)
-            current_offset += len(self.data[self.selectedTest][self.selectedEquipment]['reset'])
+            current_offset += len(self.get_selected_equipment()['reset'])
             self.row_offsets.append(current_offset)
 
     def load_json(self, file):
         with open(file, 'r') as infile:
-            self.data = json.load(infile)
-            for test in self.get_tests():
-                for equipment in self.data[test]:
-                    self.data[test][equipment]['index'] = -1
+            self.data = {}
+            raw_data = json.load(infile)
+            for item in raw_data:
+                self.data[item] = Test_Object(raw_data[item]) 
 
     def reset_index(self, equipment):
         self.data[self.selectedTest][equipment]['index'] = -1
@@ -132,6 +123,12 @@ class Test_Model(QtCore.QAbstractTableModel):
     def get_cmd_type(self, cmd_obj):
         return cmd_obj['type']
 
+    def set_equipment_param(self, equipment, p_ind, param):
+        pass
+
+    def get_selected_equipment(self):
+        return self.data[self.selectedTest][self.selectedEquipment]
+
     def setData(self, data):
         self.data = data
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
@@ -150,11 +147,11 @@ class Test_Model(QtCore.QAbstractTableModel):
             value = None
         elif index.column() == 0:
             if index.row() == self.row_offsets[0] - 1:
-                value = list(self.data[self.selectedTest][self.selectedEquipment])[0]
+                value = list(self.get_selected_equipment())[0]
             elif index.row() == self.row_offsets[1] - 1:
-                value = list(self.data[self.selectedTest][self.selectedEquipment])[1]
+                value = list(self.get_selected_equipment())[1]
             elif index.row() == self.row_offsets[2] - 1:
-                value = list(self.data[self.selectedTest][self.selectedEquipment])[2]
+                value = list(self.get_selected_equipment())[2]
         elif index.column() == 1:
             if index.row() == self.row_offsets[0] - 1:
                 value = None
@@ -163,12 +160,12 @@ class Test_Model(QtCore.QAbstractTableModel):
             elif index.row() == self.row_offsets[2] - 1:
                 value = None
             elif index.row() < self.row_offsets[1]:
-                cmd_obj = self.data[self.selectedTest][self.selectedEquipment][list(self.data[self.selectedTest][self.selectedEquipment])[0]][index.row() - self.row_offsets[0]]
+                cmd_obj = self.get_selected_equipment()[list(self.get_selected_equipment())[0]][index.row() - self.row_offsets[0]]
                 value = self.get_cmd_string(cmd_obj)
             elif index.row() < self.row_offsets[2]:
-                value = self.data[self.selectedTest][self.selectedEquipment][list(self.data[self.selectedTest][self.selectedEquipment])[1]][index.row() - self.row_offsets[1]]['cmd']
+                value = self.get_selected_equipment()[list(self.get_selected_equipment())[1]][index.row() - self.row_offsets[1]]['cmd']
             else:
-                value = self.data[self.selectedTest][self.selectedEquipment][list(self.data[self.selectedTest][self.selectedEquipment])[2]][index.row() - self.row_offsets[2]]['cmd']
+                value = self.get_selected_equipment()[list(self.get_selected_equipment())[2]][index.row() - self.row_offsets[2]]['cmd']
         if role == QtCore.Qt.DisplayRole:
             return value
         else:
@@ -178,3 +175,32 @@ class Test_Model(QtCore.QAbstractTableModel):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
             return self.header[section]
         return None
+
+class Test_Object:
+    pass
+    """
+    test:
+        {
+            equipment:
+            {
+                config: [...],
+                run: [...],
+                reset: [...]
+                index: -1
+            }
+        }
+    """
+    def __init__(self, data):
+        self.data = data
+        for equipment in self.data:
+            self.data[equipment]['index'] = -1
+
+    def __getitem__(self, key):
+        return self.data[key]
+    
+    def __len__(self):
+        return len(self.data)
+
+    def __iter__(self):
+        for elem in self.data:
+            yield elem

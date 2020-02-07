@@ -88,8 +88,7 @@
                 {
                     "type": "q",
                     "cmd": ":VOLT:IMM:AMPL?",
-                    "args": [],
-                    "ret_val": "busy"
+                    "args": []
                 }
             ],
             "reset": [
