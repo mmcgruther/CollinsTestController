@@ -221,7 +221,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>530</y>
+      <y>500</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -233,8 +233,8 @@
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>560</y>
+      <x>240</x>
+      <y>500</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -295,8 +295,8 @@
    <widget class="QLineEdit" name="PV">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>530</y>
+      <x>90</x>
+      <y>500</y>
       <width>113</width>
       <height>20</height>
      </rect>
@@ -305,8 +305,8 @@
    <widget class="QLineEdit" name="DV">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>560</y>
+      <x>320</x>
+      <y>500</y>
       <width>113</width>
       <height>20</height>
      </rect>
@@ -475,24 +475,11 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Averaging&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_7">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>380</y>
-      <width>75</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Get Average</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_20">
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>420</y>
+      <y>380</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -505,36 +492,62 @@
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>420</y>
+      <y>380</y>
       <width>113</width>
       <height>20</height>
      </rect>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_2">
+   <widget class="QPushButton" name="pushButton_7">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>500</y>
+      <x>10</x>
+      <y>530</y>
       <width>91</width>
-      <height>18</height>
+      <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Peak Marker</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_3">
+   <widget class="QPushButton" name="pushButton_8">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>500</y>
+      <x>110</x>
+      <y>530</y>
       <width>91</width>
-      <height>18</height>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Off</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_9">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>530</y>
+      <width>91</width>
+      <height>23</height>
      </rect>
     </property>
     <property name="text">
      <string>Delta Marker</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_10">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>530</y>
+      <width>91</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Off</string>
     </property>
    </widget>
   </widget>
