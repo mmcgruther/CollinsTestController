@@ -1,0 +1,29 @@
+Center Frequency	[:SENSe]:FREQuency:CENTer <freq>
+			
+			-:SENS:FREQ:CENT freq
+
+
+Span             	[:SENSe]:FREQuency:SPAN <freq>
+	
+			-:SENS:FREQ:SPAN freq
+
+
+Start Frequency 	[:SENSe]:FREQuency:STARt <freq>
+
+			-:SENS:FREQ:STAR freq
+
+
+Stop Frequency 		[:SENSe]:FREQuency:STOP <freq>
+
+			-:SENS:FREQ:STOP freq
+
+
+Resolution Bandwidth	[:SENSe]:BANDwidth:RESolution <freq>
+
+			-:SENS:BAND:RES freq
+
+
+Video Bandwidth		[:SENSe]:BANDwidth:VIDeo <freq>
+
+			-:SENS:BAND:VID freq
+
