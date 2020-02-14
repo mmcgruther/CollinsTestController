@@ -65,7 +65,7 @@
   },
   "equipment3": {
     "address": "TCPIP::192.168.1.3::10001::SOCKET",
-    "idn": "Keysight Technologies, N9320B, 45310116, A.01.02",
+    "idn": "Rigol Technologies,DSA1030A,DSA1A150400015,00.01.14.00.00",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
     "param_1": {
