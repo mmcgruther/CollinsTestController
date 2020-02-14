@@ -4,17 +4,50 @@
     "idn": "TEKTRONIX, DMM4050, nnnnnnnm, mm/dd/yy tt:tt",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
-    "func_volt_dc": {
-      "cmd": ":FUNC:VOLT:DC",
-      "mode": "w"
+    "data_source": {
+      "cmd": "DATA:SOU {0}",
+      "type": "w",
+      "default_args": [
+        "CH1"
+      ]
     },
-    "func_volt_ac": {
-      "cmd": ":FUNC:VOLT:AC",
-      "mode": "w"
+    "data_start": {
+      "type": "w",
+      "cmd": "DATA:START {0}",
+      "default_args": [
+        "1"
+      ]
     },
-    "meas_volt_dc": {
-      "cmd": ":MEAS:VOLT:DC",
-      "mode": "w"
+    "data_stop": {
+      "type": "w",
+      "cmd": "DATA:STOP {0}",
+      "default_args": [
+        "4000"
+      ]
+    },
+    "data_width": {
+      "type": "w",
+      "cmd": "DATA:WIDTH {0}",
+      "default_args": [
+        "1"
+      ]
+    },
+    "data_encoding": {
+      "type": "w",
+      "cmd": "DATA:ENC {0}",
+      "default_args": [
+        "ASCII"
+      ]
+    },
+    "get_imm_ampl": {
+      "type": "q",
+      "cmd": ":VOLT:IMM:AMPL?",
+      "default_args": []
+    },
+    "clear_device": {
+      "type": "w",
+      "cmd": "*CLS",
+      "default_args": []
     }
   },
   "equipment2": {
@@ -22,15 +55,50 @@
     "idn": "TEK/DPO3034,CF:91.1CT,FV:v1.0000",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
-    "param_1": {
-      "method": "set_lineedit",
-      "name": "Param 1:",
-      "command": "Param 1 String"
+    "data_source": {
+      "cmd": "DATA:SOU {0}",
+      "type": "w",
+      "default_args": [
+        "CH1"
+      ]
     },
-    "param_2": {
-      "method": "set_lineedit",
-      "name": "Param 2:",
-      "command": "Param 2 String"
+    "data_start": {
+      "type": "w",
+      "cmd": "DATA:START {0}",
+      "default_args": [
+        "1"
+      ]
+    },
+    "data_stop": {
+      "type": "w",
+      "cmd": "DATA:STOP {0}",
+      "default_args": [
+        "4000"
+      ]
+    },
+    "data_width": {
+      "type": "w",
+      "cmd": "DATA:WIDTH {0}",
+      "default_args": [
+        "1"
+      ]
+    },
+    "data_encoding": {
+      "type": "w",
+      "cmd": "DATA:ENC {0}",
+      "default_args": [
+        "ASCII"
+      ]
+    },
+    "get_imm_ampl": {
+      "type": "q",
+      "cmd": ":VOLT:IMM:AMPL?",
+      "default_args": []
+    },
+    "clear_device": {
+      "type": "w",
+      "cmd": "*CLS",
+      "default_args": []
     }
   },
   "equipment3": {

@@ -4,17 +4,45 @@
     "idn": "Rigol Technologies,DG4162,DG4C151300243,00.01.04",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
-    "func_volt_dc": {
-      "cmd": ":FUNC:VOLT:DC",
-      "mode": "w"
+    "set_output": {
+      "cmd": ":OUTPUT {0}",
+      "type": "w",
+      "default_args": [
+        "OFF"
+      ]
     },
-    "func_volt_ac": {
-      "cmd": ":FUNC:VOLT:AC",
-      "mode": "w"
+    "set_volts": {
+      "cmd": ":VOLT {0}",
+      "type": "w",
+      "default_args": [
+        "3"
+      ]
     },
-    "meas_volt_dc": {
-      "cmd": ":MEAS:VOLT:DC",
-      "mode": "w"
+    "set_volt_offset": {
+      "cmd": ":VOLT:OFFSet {0}",
+      "type": "w",
+      "default_args": [
+        "0"
+      ]
+    },
+    "set_frequency": {
+      "cmd": ":FREQ {0}",
+      "type": "w",
+      "default_args": [
+        "1000"
+      ]
+    },
+    "set_phase": {
+      "cmd": ":PHASe {0}",
+      "type": "w",
+      "default_args": [
+        "0"
+      ]
+    },
+    "reset_device": {
+      "cmd": "*RST",
+      "type": "w",
+      "default_args": []
     }
   },
   "oscilloscope": {
@@ -22,10 +50,12 @@
     "idn": "TEKTRONIX,DPO3034,C013408,CF:91.1CT FV:v2.23 ",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
-    "param_1": {
-      "method": "set_lineedit",
-      "name": "Param 1:",
-      "command": "Param 1 String"
+    "data_init": {
+      "type": "w",
+      "cmd": "Data {0}",
+      "default_args": [
+        "INIT"
+      ]
     },
     "param_2": {
       "method": "set_lineedit",

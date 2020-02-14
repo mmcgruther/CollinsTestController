@@ -78,4 +78,11 @@ class Equipment_Model:
 
     def get_connected_equipment(self, addr):
         if self.data[addr]['connected']:
-            return self.data[addr]['equipment']
+            return self.data[addr]['equipment'][self.data[addr]['index']]
+        else:
+            return None
+
+    def get_formatted_cmd_tuple(self, addr, name, args):
+        #print(self.data[addr]['equipment'][self.data[addr]['index']])
+        cmd_obj = self.data[addr]['equipment'][self.data[addr]['index']][name]
+        return cmd_obj['cmd'].format(*args), cmd_obj['type']

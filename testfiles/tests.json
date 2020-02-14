@@ -1,103 +1,110 @@
 {
     "test1": {
         "equipment1": {
-            "config": [
+            "config": {
+                "Data Source":
                 {
-                    "type": "w",
-                    "cmd": "DATA:SOU {0}",
+                    "name": "data_source",
                     "args": [
                         "CH1"
                     ]
                 },
+                "Data Start":
                 {
-                    "type": "w",
-                    "cmd": "DATA:START {0}",
+                    "name": "data_start",
                     "args": [
                         "1"
                     ]
                 },
+                "Data Stop":
                 {
-                    "type": "w",
-                    "cmd": "DATA:STOP {0}",
+                    "name": "data_start",
                     "args": [
                         "4000"
                     ]
                 },
+                "Data Width":
                 {
-                    "type": "w",
-                    "cmd": "DATA:WIDTH {0}",
+                    "name": "data_width",
                     "args": [
                         "1"
                     ]
                 },
+                "Data Encoding":
                 {
-                    "type": "w",
-                    "cmd": "DATA:ENC {0}",
+                    "name": "data_encoding",
                     "args": [
                         "ASCII"
                     ]
                 }
-            ],
-            "run": [
+            },
+            "run": {
+                "Get Immediate Amplitude":
                 {
-                    "type": "q",
-                    "cmd": ":VOLT:IMM:AMPL?",
+                    "name": "get_imm_ampl",
                     "args": []
                 }
-            ],
-            "reset": [
+            },
+            "reset": {
+                "Clear Device":
                 {
-                    "type": "w",
-                    "cmd": "*CLS",
+                    "name": "clear_device",
                     "args": []
                 }
-            ]
+            }
         },
         "equipment2": {
-            "config": [
+            "config": {
+                "Data Source":
                 {
-                    "type": "w",
-                    "cmd": "DATA:START {0}",
+                    "name": "data_source",
+                    "args": [
+                        "CH1"
+                    ]
+                },
+                "Data Start":
+                {
+                    "name": "data_start",
                     "args": [
                         "1"
                     ]
                 },
+                "Data Stop":
                 {
-                    "type": "w",
-                    "cmd": "DATA:STOP {0}",
+                    "name": "data_start",
                     "args": [
                         "4000"
                     ]
                 },
+                "Data Width":
                 {
-                    "type": "w",
-                    "cmd": "DATA:WIDTH {0}",
+                    "name": "data_width",
                     "args": [
                         "1"
                     ]
                 },
+                "Data Encoding":
                 {
-                    "type": "w",
-                    "cmd": "DATA:ENC {0}",
+                    "name": "data_encoding",
                     "args": [
                         "ASCII"
                     ]
                 }
-            ],
-            "run": [
+            },
+            "run": {
+                "Get Immediate Amplitude":
                 {
-                    "type": "q",
-                    "cmd": ":VOLT:IMM:AMPL?",
+                    "name": "get_imm_ampl",
                     "args": []
                 }
-            ],
-            "reset": [
+            },
+            "reset": {
+                "Clear Device":
                 {
-                    "type": "w",
-                    "cmd": "*CLS",
+                    "name": "clear_device",
                     "args": []
                 }
-            ]
+            }
         }
     },
     "test2": {

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWid
 from final import Controller_Model
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import sys, time, json
 
 class Main_Window(QMainWindow):
@@ -15,8 +16,10 @@ class Main_Window(QMainWindow):
         self.controller_model.signal_set_abort_button.connect(self.slot_set_abort_button)
         self.controller_model.signal_set_test_combobox.connect(self.slot_set_test_combobox)
         self.controller_model.signal_set_equipment_combobox.connect(self.slot_set_equipment_combobox)
+        self.controller_model.signal_set_phase_combobox.connect(self.slot_set_phase_combobox)
 
         self.controller_model.signal_set_equipment_list.connect(self.slot_set_equipment_list)
+        self.controller_model.signal_set_phase_list.connect(self.slot_set_phase_list)
 
         self.initUI()
 
@@ -41,26 +44,35 @@ class Main_Window(QMainWindow):
         self.test_tableview.setModel(self.controller_model.get_test_model())
 
         self.test_combobox = self.findChild(QComboBox, 'test_combobox')
-        for test in self.controller_model.get_tests():
+        for test in self.controller_model.get_test_list():
             self.test_combobox.addItem(test)
         self.test_combobox.currentIndexChanged.connect(self.controller_model.slot_change_selected_test)
 
         self.equipment_combobox = self.findChild(QComboBox, 'equipment_combobox')
+        self.equipment_combobox.currentIndexChanged.connect(self.controller_model.slot_change_selected_equipment)
+
+        self.phase_combobox = self.findChild(QComboBox, 'phase_combobox')
+        self.phase_combobox.currentIndexChanged.connect(self.controller_model.slot_change_selected_phase)
+
         self.test_combobox.currentIndexChanged.emit(0)
-        self.equipment_combobox.currentIndexChanged.connect(self.controller_model.slot_selected_equipment_changed)
 
         self.graphics_view = self.findChild(QGraphicsView, 'graphics_view')
-        figure = Figure()
-        axes = figure.gca()
-        axes.set_title("title")
-        canvas = FigureCanvas(figure)
-        scene = QGraphicsScene(self.graphics_view)
-        scene.addWidget(canvas)
-        self.graphics_view.setScene(scene)
+        self.figure = plt.figure()        
+        self.canvas = FigureCanvas(self.figure)
+        self.scene = QGraphicsScene(self.graphics_view)
+        self.scene.addWidget(self.canvas)
+        self.graphics_view.setScene(self.scene)
+        self.canvas.draw()
         self.show()
+        self.controller_model.signal_update_canvas.connect(self.slot_update_canvas)
 
         self.pin_button = self.findChild(QPushButton, 'pin_button')
         self.pin_button.clicked.connect(self.slot_open_pin_dialog)
+
+    def slot_update_canvas(self, data):
+       
+        plt.plot(data)
+        self.canvas.draw()
 
     @QtCore.pyqtSlot(bool)
     def slot_set_refresh_button(self, state):
@@ -82,11 +94,21 @@ class Main_Window(QMainWindow):
     def slot_set_equipment_combobox(self, state):
         self.equipment_combobox.setEnabled(state)
 
+    @QtCore.pyqtSlot(bool)
+    def slot_set_phase_combobox(self, state):
+        self.phase_combobox.setEnabled(state)
+
     @QtCore.pyqtSlot(list)
     def slot_set_equipment_list(self, equipment_list):
         self.equipment_combobox.clear()
         for equipment in equipment_list:
             self.equipment_combobox.addItem(equipment)
+
+    @QtCore.pyqtSlot(list)
+    def slot_set_phase_list(self, phase_list):
+        self.phase_combobox.clear()
+        for phase in phase_list:
+            self.phase_combobox.addItem(phase)
 
     @QtCore.pyqtSlot()
     def slot_open_pin_dialog(self):

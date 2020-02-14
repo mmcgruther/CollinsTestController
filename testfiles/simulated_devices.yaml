@@ -118,7 +118,7 @@ devices:
           query_error: 4
     properties:
       voltage:
-        default: 1.0
+        default: 3.0
         getter:
           q: ":VOLT:IMM:AMPL?"
           r: "{:+.8E}"

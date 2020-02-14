@@ -1,121 +1,119 @@
 {
     "test1": {
         "oscilloscope": {
-            "config": [
-                {
+            "config": {
+                "data_init": {
                     "type": "w",
                     "cmd": "Data {0}",
                     "args": [
                         "INIT"
                     ]
-		},
-		{
+                },
+                "data_sou": {
                     "type": "w",
                     "cmd": "DATA:SOU {0}",
                     "args": [
                         "CH1"
                     ]
                 },
-                {
+                "data_start": {
                     "type": "w",
                     "cmd": "DATA:START {0}",
                     "args": [
                         "1"
                     ]
                 },
-                {
+                "data_stop": {
                     "type": "w",
                     "cmd": "DATA:STOP {0}",
                     "args": [
                         "4000"
                     ]
                 },
-                {
+                "data_width": {
                     "type": "w",
                     "cmd": "DATA:WIDTH {0}",
                     "args": [
                         "1"
                     ]
                 },
-                {
+                "data_enc": {
                     "type": "w",
                     "cmd": "DATA:ENC {0}",
                     "args": [
                         "ASCII"
                     ]
                 }
-            ],
-            "run": [
-                {
+            },
+            "run": {
+                "get_curve": {
                     "type": "q",
                     "cmd": "CURVE?",
                     "args": []
                 }
-            ],
-            "reset": [
-                {
+            },
+            "reset": {
+                "cls": {
                     "type": "w",
                     "cmd": "*CLS",
                     "args": []
                 }
-            ]
+            }
         },
-	"function generator": {
-            "config": [
-                {
+        "function generator": {
+            "config": {
+                "Disable Output": {
+                    "name": "set_output",
                     "type": "w",
-                    "cmd": ":OUTPUT {0}",
                     "args": [
                         "OFF"
                     ]
-		},
-		{
+                },
+                "Set Volts": {
+                    "name": "set_volts",
                     "type": "w",
-                    "cmd": ":VOLT {0}",
                     "args": [
                         "5"
                     ]
                 },
-                {
+                "Set Voltage Offset": {
+                    "name": "set_volt_offset",
                     "type": "w",
-                    "cmd": ":VOLT:OFFSet {0}",
                     "args": [
                         "1"
                     ]
                 },
-                {
+                "Set Frequency": {
+                    "name": "set_frequency",
                     "type": "w",
-                    "cmd": ":FREQ {0}",
                     "args": [
                         "1000000"
                     ]
                 },
-                {
+                "Set Phase": {
+                    "name": "set_phase",
                     "type": "w",
-                    "cmd": ":PHASe {0}",
                     "args": [
                         "90"
                     ]
                 },
-                {
+                "Enable Output": {
+                    "name": "set_output",
                     "type": "w",
-                    "cmd": ":OUTPUT {0}",
                     "args": [
                         "ON"
                     ]
-		}
-            ],
-            "run": [
-            ],
-            "reset": [
-                {
+                }
+            },
+            "run": {},
+            "reset": {
+                "Reset Device": {
+                    "name": "reset_device",
                     "type": "w",
-                    "cmd": "*RST",
                     "args": []
-		}
-	    ]
-	}
+                }
+            }
+        }
     },
-    "test2": {
-    }
+    "test2": {}
 }

@@ -18,5 +18,11 @@ class Controller_Test(unittest.TestCase):
         self.assertEqual(self.main_window.controller_model.equipment_model.get_connected("TCPIP::192.168.1.2::10001::SOCKET"), 1)
         self.assertEqual(self.main_window.controller_model.equipment_model.get_connected("TCPIP::192.168.1.3::10001::SOCKET"), 1)
 
+    def test_execution(self):
+        QTest.mouseClick(self.main_window.refresh_button, Qt.LeftButton)
+        QTest.qWait(1000)
+        QTest.mouseClick(self.main_window.execute_button, Qt.LeftButton)
+        QTest.qWait(2000)
+
 if __name__ == "__main__":
     unittest.main()
