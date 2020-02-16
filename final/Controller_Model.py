@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QTimer
 from final import Equipment_Model, Test_Model, Visa_Worker, IP_Table_Model
 import json, threading
+import numpy as np
 
 class Controller_Model(QtCore.QObject):
    
@@ -18,7 +19,7 @@ class Controller_Model(QtCore.QObject):
         self.workersInit = False
         self.phase_list = ['config','run','reset']
         self.runRepetitions = 10
-        self.runPeriod = 100
+        self.runPeriod = 1000
         self.runCounter = 0
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.timer_callback)
@@ -141,9 +142,12 @@ class Controller_Model(QtCore.QObject):
         self.plot_data = []
 
     def update_output(self, str_data):
-        data = float(str_data)
-        print(data)
-        self.plot_data.append(data)
+        #data = float(str_data)
+        data_split = str_data.split(',')
+        data_array = np.array(list(map(float, data_split[1:])))
+        #print(data)
+        #self.plot_data.append(data)
+        self.plot_data = data_array
         self.signal_update_canvas.emit(self.plot_data)
 
     @QtCore.pyqtSlot(str, str)

@@ -104,7 +104,7 @@
     }
   },
   "Spectrum Analyzer": {
-    "address": "TCPIP::192.168.1.3::10001::SOCKET",
+    "address": "TCPIP0::192.168.1.30::INSTR",
     "idn": "Rigol Technologies,DSA1030A,DSA1A150400015,00.01.14.00.00",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
@@ -142,6 +142,30 @@
       "default_args": [
         "1MHZ"
       ]
+    },
+    "set_peak_table_state": {
+    	"cmd": ":TRACe:MATH:PEAK:TABLe:STATe {0}",
+	"type": "w",
+	"default_args": [
+		"OFF"
+	]
+    },
+    "set_peak_sort": {
+    	"cmd": ":TRACe:MATH:PEAK:SORT {0}",
+	"type": "w",
+	"default_args": [
+		"FREQ"
+	]
+    },
+    "get_trace": {
+	    "cmd": ":TRACe? TRACE1",
+	    "type": "q",
+	    "default_args": []
+    },
+    "get_peak": {
+    	"cmd": ":TRACe:MATH:PEAK?",
+	"type": "q",
+	"default_args": []
     }
   },
   "equipment4": {

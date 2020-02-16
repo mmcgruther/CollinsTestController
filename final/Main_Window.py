@@ -70,8 +70,9 @@ class Main_Window(QMainWindow):
         self.pin_button.clicked.connect(self.slot_open_pin_dialog)
 
     def slot_update_canvas(self, data):
-       
-        plt.plot(data)
+        self.data = data
+        plt.clf()
+        plt.plot(self.data)
         self.canvas.draw()
 
     @QtCore.pyqtSlot(bool)
