@@ -24,7 +24,7 @@ class Test_Model(QtCore.QAbstractTableModel):
         }
     }
     """
-    def __init__(self, parent, file, header = ['Categories', 'Commands','Parameter 1','Parameter 2','Parameter 3'], *args):
+    def __init__(self, parent, file, header = ['Commands','Parameter 1','Parameter 2','Parameter 3'], *args):
         super(Test_Model, self).__init__()
         self.data = {}
         self.load_json(file)

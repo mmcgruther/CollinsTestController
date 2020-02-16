@@ -1,5 +1,5 @@
 {
-  "function generator": {
+  "Function Generator": {
     "address": "TCPIP0::192.168.1.21::INSTR",
     "idn": "Rigol Technologies,DG4162,DG4C151300243,00.01.04",
     "timeout": 1000,
@@ -45,7 +45,7 @@
       "default_args": []
     }
   },
-  "oscilloscope": {
+  "Oscilloscope": {
     "address": "TCPIP0::192.168.1.20::INSTR",
     "idn": "TEKTRONIX,DPO3034,C013408,CF:91.1CT FV:v2.23 ",
     "timeout": 1000,
@@ -57,26 +57,91 @@
         "INIT"
       ]
     },
-    "param_2": {
-      "method": "set_lineedit",
-      "name": "Param 2:",
-      "command": "Param 2 String"
+    "data_sou": {
+      "type": "w",
+      "cmd": "DATA:SOU {0}",
+      "default_args": [
+        "CH1"
+      ]
+    },
+    "data_start": {
+      "type": "w",
+      "cmd": "DATA:START {0}",
+      "default_args": [
+        "1"
+      ]
+    },
+    "data_stop": {
+      "type": "w",
+      "cmd": "DATA:STOP {0}",
+      "default_args": [
+        "4000"
+      ]
+    },
+    "data_width": {
+      "type": "w",
+      "cmd": "DATA:WIDTH {0}",
+      "default_args": [
+        "1"
+      ]
+    },
+    "data_enc": {
+      "type": "w",
+      "cmd": "DATA:ENC {0}",
+      "default_args": [
+        "ASCII"
+      ]
+    },
+    "get_curve": {
+      "type": "q",
+      "cmd": "CURVE?",
+      "default_args": []
+    },
+    "cls": {
+      "type": "w",
+      "cmd": "*CLS",
+      "args": []
     }
   },
-  "equipment3": {
+  "Spectrum Analyzer": {
     "address": "TCPIP::192.168.1.3::10001::SOCKET",
     "idn": "Rigol Technologies,DSA1030A,DSA1A150400015,00.01.14.00.00",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
-    "param_1": {
-      "method": "set_lineedit",
-      "name": "Param 1:",
-      "command": "Param 1 String"
+    "set_center_freq": {
+      "cmd": ":SENS:FREQ:CENT {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
     },
-    "param_2": {
-      "method": "set_lineedit",
-      "name": "Param 2:",
-      "command": "Param 2 String"
+    "set_span_freq": {
+      "cmd": ":SENS:FREQ:SPAN {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
+    },
+    "set_start_freq": {
+      "cmd": ":SENS:FREQ:STARt {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
+    },
+    "set_stop_freq": {
+      "cmd": ":SENS:FREQ:STOP {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
+    },
+    "set_resolution_bandwidth": {
+      "cmd": ":SENS:BAND:RES {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
     }
   },
   "equipment4": {

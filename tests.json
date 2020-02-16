@@ -1,105 +1,39 @@
 {
-    "test1": {
-        "oscilloscope": {
-            "config": {
-                "data_init": {
-                    "type": "w",
-                    "cmd": "Data {0}",
-                    "args": [
-                        "INIT"
-                    ]
-                },
-                "data_sou": {
-                    "type": "w",
-                    "cmd": "DATA:SOU {0}",
-                    "args": [
-                        "CH1"
-                    ]
-                },
-                "data_start": {
-                    "type": "w",
-                    "cmd": "DATA:START {0}",
-                    "args": [
-                        "1"
-                    ]
-                },
-                "data_stop": {
-                    "type": "w",
-                    "cmd": "DATA:STOP {0}",
-                    "args": [
-                        "4000"
-                    ]
-                },
-                "data_width": {
-                    "type": "w",
-                    "cmd": "DATA:WIDTH {0}",
-                    "args": [
-                        "1"
-                    ]
-                },
-                "data_enc": {
-                    "type": "w",
-                    "cmd": "DATA:ENC {0}",
-                    "args": [
-                        "ASCII"
-                    ]
-                }
-            },
-            "run": {
-                "get_curve": {
-                    "type": "q",
-                    "cmd": "CURVE?",
-                    "args": []
-                }
-            },
-            "reset": {
-                "cls": {
-                    "type": "w",
-                    "cmd": "*CLS",
-                    "args": []
-                }
-            }
-        },
-        "function generator": {
+    "Simple FuncGen/Oscope": {
+        "Function Generator": {
             "config": {
                 "Disable Output": {
                     "name": "set_output",
-                    "type": "w",
                     "args": [
                         "OFF"
                     ]
                 },
                 "Set Volts": {
                     "name": "set_volts",
-                    "type": "w",
                     "args": [
                         "5"
                     ]
                 },
                 "Set Voltage Offset": {
                     "name": "set_volt_offset",
-                    "type": "w",
                     "args": [
                         "1"
                     ]
                 },
                 "Set Frequency": {
                     "name": "set_frequency",
-                    "type": "w",
                     "args": [
                         "1000000"
                     ]
                 },
                 "Set Phase": {
                     "name": "set_phase",
-                    "type": "w",
                     "args": [
                         "90"
                     ]
                 },
                 "Enable Output": {
                     "name": "set_output",
-                    "type": "w",
                     "args": [
                         "ON"
                     ]
@@ -109,11 +43,84 @@
             "reset": {
                 "Reset Device": {
                     "name": "reset_device",
-                    "type": "w",
                     "args": []
                 }
             }
+        },
+        "Oscilloscope": {
+            "config": {
+                "Initialize data": {
+                    "name": "data_init",
+                    "args": [
+                        "INIT"
+                    ]
+                },
+                "Select source": {
+                    "name": "data_sou",
+                    "args": [
+                        "CH1"
+                    ]
+                },
+                "Start data": {
+                    "name": "data_start",
+                    "args": [
+                        "1"
+                    ]
+                },
+                "Stop data": {
+                    "name": "data_stop",
+                    "args": [
+                        "4000"
+                    ]
+                },
+                "Data width": {
+                    "name": "data_width",
+                    "args": [
+                        "1"
+                    ]
+                },
+                "Data encoding": {
+                    "name": "data_enc",
+                    "args": [
+                        "ASCII"
+                    ]
+                }
+            },
+            "run": {
+                "Get Curve": {
+                    "name": "get_curve",
+                    "args": []
+                }
+            },
+            "reset": {
+                "Clear event registers": {
+                    "name": "cls",
+                    "args": []
+                }
+                
+            }
         }
     },
-    "test2": {}
+    "Pin vs Pout": {
+        "Spectrum Analyzer": {
+            "config": {
+                "Set Center Frequency":
+                {
+                    "name": "set_center_freq",
+                    "args": [
+                        "2MHZ"
+                    ]
+                },
+                "Set Frequency Span":
+                {
+                    "name": "set_span_freq",
+                    "args": [
+                        "1MHZ"
+                    ]
+                }
+            },
+            "run": {},
+            "reset": {}
+        }
+    }
 }
