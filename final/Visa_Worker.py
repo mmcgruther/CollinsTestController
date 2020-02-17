@@ -1,4 +1,4 @@
-#import pyvisa
+
 from PyQt5 import QtCore
 import sys, time, threading
 from final.Visa_Wrapper import Visa_Session

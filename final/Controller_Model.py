@@ -74,8 +74,8 @@ class Controller_Model(QtCore.QObject):
             self.equipment_model.reset_index(addr)
             self.set_connected(addr, 2)
             
-            if not self.workersInit:           
-                self.set_worker(self.create_worker(addr), addr)
+            if not self.workersInit:  
+                self.equipment_model.set_worker(self.create_worker(addr), addr)         
 
             self.next_connection(addr)
  
@@ -330,9 +330,6 @@ class Controller_Model(QtCore.QObject):
 
     def set_connected(self, addr, value):
         self.equipment_model.set_connected(addr, value)
-
-    def set_worker(self, worker, addr):
-        self.equipment_model.set_worker(worker, addr)
 
     def get_equipment_idn(self, addr):
         return self.equipment_model.get_equipment_idn(addr)
