@@ -102,49 +102,90 @@
         }
     },
     "Pin vs Pout": {
+        "Function Generator": {
+            "config": {
+                "Disable Output": {
+                    "name": "set_output",
+                    "args": [
+                        "OFF"
+                    ]
+                },
+                "Set Volts": {
+                    "name": "set_volts",
+                    "args": [
+                        "0.02"
+                    ]
+                },
+                "Set Voltage Offset": {
+                    "name": "set_volt_offset",
+                    "args": [
+                        "0"
+                    ]
+                },
+                "Set Frequency": {
+                    "name": "set_frequency",
+                    "args": [
+                        "1000000"
+                    ]
+                },
+                "Set Phase": {
+                    "name": "set_phase",
+                    "args": [
+                        "90"
+                    ]
+                },
+                "Enable Output": {
+                    "name": "set_output",
+                    "args": [
+                        "ON"
+                    ]
+                }
+            },
+            "run": {},
+            "reset": {
+                "Reset Device": {
+                    "name": "reset_device",
+                    "args": []
+                }
+            }
+        },
         "Spectrum Analyzer": {
             "config": {
-                "Set Center Frequency":
-                {
+                "Set Center Frequency": {
                     "name": "set_center_freq",
                     "args": [
                         "150MHZ"
                     ]
                 },
-                "Set Frequency Span":
-                {
+                "Set Frequency Span": {
                     "name": "set_span_freq",
                     "args": [
                         "50MHZ"
                     ]
                 },
-		"Enable Peak Table State":
-		{
-			"name": "set_peak_table_state",
-			"args": [
-				"ON"
-			]
-		},
-		"Set Peak Sort Ampl":
-		{
-			"name": "set_peak_sort",
-			"args": [
-				"AMPL"
-			]
-		}	
+                "Enable Peak Table State": {
+                    "name": "set_peak_table_state",
+                    "args": [
+                        "ON"
+                    ]
+                },
+                "Set Peak Sort Ampl": {
+                    "name": "set_peak_sort",
+                    "args": [
+                        "AMPL"
+                    ]
+                }
             },
             "run": {
-		    "Get Trace":
-		    {
-			    "name": "get_trace",
-			    "args": []
-		    },
-		    "Get Peak":
-		    {
-			    "name": "get_peak",
-			    "args": []
-		    }
-	    },
+                "Get Trace": {
+                    "name": "get_trace",
+                    "args": []
+                },
+                "Get Peak": {
+                    "name": "get_peak",
+                    "args": []
+                }
+            },
             "reset": {}
         }
     }
