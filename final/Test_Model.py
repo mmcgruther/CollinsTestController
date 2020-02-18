@@ -27,16 +27,35 @@ class Test_Model(QtCore.QAbstractTableModel):
     def __init__(self, parent, file, header = ['Commands','Parameter 1','Parameter 2','Parameter 3'], *args):
         super(Test_Model, self).__init__()
         self.data = {}
+        self.parent = parent
         self.load_json(file)
         self.header = header
         self.selectedTest = None
         self.selectedEquipment = None
         self.selectedPhase = None
+        self.rowNumber = 0
 
-    def set_view_selections(self, test, equipment, phase):
+    def set_view_selections(self, test, equipment, phase):           
         self.selectedTest = test
         self.selectedEquipment = equipment
         self.selectedPhase = phase
+        
+        if self.selectedTest is None:
+            newRows = 0
+        elif self.selectedEquipment is None:
+            newRows = 0
+        elif self.selectedPhase is None:
+            newRows = 0
+        else:
+            newRows = len(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])
+        
+        row_diff = newRows - self.rowNumber
+        self.rowNumber = newRows
+        if row_diff > 0:
+            self.insertRows(self.parent, 0, row_diff)
+        if row_diff < 0:
+            self.removeRows(self.parent, 0, -row_diff)
+        self.rowNumber = newRows
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
 
     def load_json(self, file):
@@ -60,6 +79,12 @@ class Test_Model(QtCore.QAbstractTableModel):
 
     def get_num_reset_commands(self, test, equipment):
         return len(self.data[test][equipment]['reset'])
+        
+    def get_num_args(self, test, equipment, phase, command):
+        num = None
+        if test and equipment and phase and command:
+            num = len(self.data[test][equipment][phase][command]['args'])
+        return num
    
     def set_equipment_args(self, test, equipment, phase, cmd, args):
         self.data[test][equipment][phase][cmd]['args'] = args
@@ -83,6 +108,18 @@ class Test_Model(QtCore.QAbstractTableModel):
         else:
             return len(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])
 
+    def insertRows(self, parent, row, count):
+        first = row
+        last = row + count - 1
+        self.beginInsertRows(QtCore.QModelIndex(), first, last)
+        self.endInsertRows()
+
+    def removeRows(self, parent, row, count):
+        first = row
+        last = row + count - 1
+        self.beginRemoveRows(QtCore.QModelIndex(), first, last)
+        self.endRemoveRows()
+
     def columnCount(self, parent):
         return len(self.header)
 
@@ -105,6 +142,30 @@ class Test_Model(QtCore.QAbstractTableModel):
             return value
         else:
             return QtCore.QVariant()
+
+    def setData(self, index, value, role):
+        if not index.isValid():
+            return False
+        if role == QtCore.Qt.EditRole:
+            if index.column() == 0:
+                return False
+            else:
+                command = list(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])[index.row()]
+                numArgs = self.get_num_args(self.selectedTest,self.selectedEquipment,self.selectedPhase,command)
+                if numArgs > (index.column() - 1):
+                    self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase][command]['args'][0] = value
+                    return True
+                else:
+                    return False
+        return False
+
+    def flags(self, index):
+        if not index.isValid():
+            return QtCore.Qt.ItemIsEditable
+        if index.column() == 0:
+            return QtCore.QAbstractTableModel.flags(self, index) | QtCore.Qt.ItemIsSelectable
+        else:
+            return QtCore.QAbstractTableModel.flags(self, index) | QtCore.Qt.ItemIsEditable
 
     def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
