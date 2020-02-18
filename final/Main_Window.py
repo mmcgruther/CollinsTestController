@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog
 from final import Controller_Model
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -68,6 +68,21 @@ class Main_Window(QMainWindow):
 
         self.pin_button = self.findChild(QPushButton, 'pin_button')
         self.pin_button.clicked.connect(self.slot_open_pin_dialog)
+
+        self.action_new_test = self.findChild(QAction, 'action_new_test')
+        self.action_new_test.triggered.connect(self.slot_add_new_test)
+
+    @QtCore.pyqtSlot()
+    def slot_add_new_test(self):
+        #Dialog for new test name
+        name, ok = QInputDialog.getText(self, "New Test", "Test name:")
+        #Add test to model
+        if ok:
+            self.controller_model.add_new_test(name)
+            #Select new test
+            numTests = len(self.controller_model.get_test_list())
+            #self.test_combobox.currentIndexChanged.emit(numTests - 1)
+            self.test_combobox.setCurrentIndex(numTests - 1)
 
     def slot_update_canvas(self, data):
         self.data = data

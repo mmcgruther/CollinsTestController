@@ -35,6 +35,8 @@ class Controller_Model(QtCore.QObject):
     signal_set_equipment_list = QtCore.pyqtSignal(list)
     signal_set_phase_list = QtCore.pyqtSignal(list)
 
+    def add_new_test(self, testName):
+        print(testName)
 
     def timer_callback(self):
         print("Timer Elapsed")
