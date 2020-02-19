@@ -1,31 +1,24 @@
 import visa
 
-class Test_Command:
-    def __init__(self, func, cmd, *args):
-        self.cmd = cmd
-        self.func = func
-        self.args = args
-
-    def get_cmd_string(self):
-        test = [10,21,32]
-        return cmd.format(test)
-
-
 class Visa_Session:
-    def __init__(self, addr):
+    def __init__(self, addr, backend):
         self.addr = addr
-        self.rm = visa.ResourceManager('@py')
+        self.rm = visa.ResourceManager(backend)
         
     def connect(self):
-        self.device = self.rm.open_resource(self.addr)
+        failure = False
+        try:
+            self.device = self.rm.open_resource(self.addr, write_termination='\n', read_termination='\n')
+        except:
+            failure = True
+        return failure
 
     def query(self, cmd, *args):
         response = None
         try:
-            self.device.query(cmd)
+            response = self.device.query(cmd)
         except:
             pass
-
         return response
 
     def write(self, cmd, *args):
@@ -34,9 +27,5 @@ class Visa_Session:
             self.device.write(cmd)
         except:
             failure = True
-        
         return failure
-
-    def run_test_cmd(self, test_cmd):
-        pass
 

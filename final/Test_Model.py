@@ -5,102 +5,148 @@ class Test_Model(QtCore.QAbstractTableModel):
     """
     data:
     {
-        test:
+        "test":
         {
-            equipment:
+            "equipment":
             {
-                config: [...],
-                run: [...],
-                reset: [...]
-                index: -1
+                "config": 
+                {
+                    "data_init":
+                    {
+                        "args": [
+                            "INIT"
+                        ]
+                    }
+                },
+                run: {...},
+                reset: {...},
             }
         }
     }
     """
-    def __init__(self, parent, file = None, header = ['Categories', 'Commands'], *args):
+    def __init__(self, parent, file, header = ['Commands','Parameter 1','Parameter 2','Parameter 3'], *args):
         super(Test_Model, self).__init__()
         self.data = {}
-        self.load_json("tests.json")
+        self.parent = parent
+        self.load_json(file)
         self.header = header
-        self.selectedTest = list(self.data)[0]
+        self.selectedTest = None
         self.selectedEquipment = None
-        self.default_equipment_select()
-        self.update_row_offsets()
+        self.selectedPhase = None
+        self.rowNumber = 0
 
-    def default_equipment_select(self):
-        if len(self.data[self.selectedTest]) == 0:
-            self.selectedEquipment = None
+    def set_view_selections(self, test, equipment, phase):           
+        self.selectedTest = test
+        self.selectedEquipment = equipment
+        self.selectedPhase = phase
+        
+        if self.selectedTest is None:
+            newRows = 0
+        elif self.selectedEquipment is None:
+            newRows = 0
+        elif self.selectedPhase is None:
+            newRows = 0
         else:
-            self.selectedEquipment = list(self.data[self.selectedTest])[0]
-
-    def slot_selected_test_changed(self, index):
-        self.selectedTest = list(self.data)[index]
-        self.default_equipment_select()
-        self.update_row_offsets()
+            newRows = len(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])
+        
+        row_diff = newRows - self.rowNumber
+        if row_diff > 0:
+            self.insertRows(self.parent, 0, row_diff)
+        if row_diff < 0:
+            self.removeRows(self.parent, 0, -row_diff)
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
-
-    def slot_selected_equipment_changed(self, index):
-        if index < 0:
-            self.selectedEquipment = None
-        else:
-            self.selectedEquipment = list(self.data[self.selectedTest])[index]
-        self.update_row_offsets()
-        self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
-
-    def update_row_offsets(self):
-        self.row_offsets = []
-        current_offset = 1
-        self.row_offsets.append(current_offset)
-        if self.selectedEquipment is not None:
-            current_offset += len(self.data[self.selectedTest][self.selectedEquipment]['config']) + 1
-            self.row_offsets.append(current_offset)
-            current_offset += len(self.data[self.selectedTest][self.selectedEquipment]['run']) + 1
-            self.row_offsets.append(current_offset)
-            current_offset += len(self.data[self.selectedTest][self.selectedEquipment]['reset'])
-            self.row_offsets.append(current_offset)
 
     def load_json(self, file):
-        infile = open(file, 'r')
-        self.data = json.load(infile)
-        for test in self.get_tests():
-            for equipment in self.data[test]:
-                self.data[test][equipment]['index'] = -1
+        with open(file, 'r') as infile:
+            self.data = json.load(infile)
 
-    def reset_index(self, equipment):
-        self.data[self.selectedTest][equipment]['index'] = -1
-
-    def get_tests(self):
+    def get_test_list(self):
         return list(self.data)
 
-    def get_test_equipment(self):
-        return list(self.data[self.selectedTest])
+    def get_test_equipment_list(self, test):
+        ret_list = []
+        if self.data[test] is not None:
+            ret_list = list(self.data[test])
+        return ret_list
 
-    def get_num_config_commands(self, equipment):
-        return len(self.data[self.selectedTest][equipment]['config'])
+    def get_cmd_objs(self, test, equipment, phase):
+        return self.data[test][equipment][phase]
 
-    def get_next_config_command(self, equipment):
-        self.data[self.selectedTest][equipment]['index'] += 1
-        valid_index = self.data[self.selectedTest][equipment]['index'] < self.get_num_config_commands(equipment)
-        if valid_index:
-            cmd_obj = self.data[self.selectedTest][equipment]['config'][self.data[self.selectedTest][equipment]['index']]
-            cmd = self.get_cmd_string(cmd_obj)
+    def get_num_config_commands(self, test, equipment):
+        return len(self.data[test][equipment]['config'])
+
+    def get_num_run_commands(self, test, equipment):
+        return len(self.data[test][equipment]['run'])
+
+    def get_num_reset_commands(self, test, equipment):
+        return len(self.data[test][equipment]['reset'])
+        
+    def get_num_args(self, test, equipment, phase, command):
+        num = None
+        if test and equipment and phase and command:
+            num = len(self.data[test][equipment][phase][command]['args'])
+        return num
+   
+    def set_equipment_args(self, test, equipment, phase, cmd, args):
+        self.data[test][equipment][phase][cmd]['args'] = args
+
+    def get_selected_row_args(self, row):
+        key_list = list(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase].keys())
+        command_name = key_list[row]
+        return list(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase][command_name]['args'])
+
+    def is_test(self, testName):
+        if testName in self.data.keys():
+            return True
         else:
-            self.reset_index(equipment)
-            cmd = None
-        return cmd
+            return False
 
-    def get_indexed_command(self, equipment):
-        pass
+    def is_equipment(self, test, equipment):
+        if equipment in self.data[test].keys():
+            return True
+        else:
+            return False
 
-    def get_cmd_string(self, cmd_obj):
-        return cmd_obj['cmd'].format(*cmd_obj['args'])
+    def append_new_test(self, testName):
+        self.data[testName] = {}
+
+    def append_new_equipment(self, test, equipment):
+        self.data[test][equipment] = {"config": {}, "run": {}, "reset": {}}
+
+    def append_new_command(self, command, commandName, test, equipment, phase):
+        newCommand = {"name": command, "args": []}
+        if commandName not in self.data[test][equipment][phase].keys():
+            self.data[test][equipment][phase][commandName] = newCommand
+            self.insertRows(self.parent, 0, 1)
+            self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
 
     def setData(self, data):
         self.data = data
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
 
     def rowCount(self, parent):
-        return self.row_offsets[-1]
+        if self.selectedTest is None:
+            return 0
+        elif self.selectedEquipment is None:
+            return 0
+        elif self.selectedPhase is None:
+            return 0
+        else:
+            return len(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])
+
+    def insertRows(self, parent, row, count):
+        first = row
+        last = row + count - 1
+        self.beginInsertRows(QtCore.QModelIndex(), first, last)
+        self.endInsertRows()
+        self.rowNumber += count
+
+    def removeRows(self, parent, row, count):
+        first = row
+        last = row + count - 1
+        self.beginRemoveRows(QtCore.QModelIndex(), first, last)
+        self.endRemoveRows()
+        self.rowNumber -= count
 
     def columnCount(self, parent):
         return len(self.header)
@@ -112,30 +158,42 @@ class Test_Model(QtCore.QAbstractTableModel):
         if self.selectedEquipment is None:
             value = None
         elif index.column() == 0:
-            if index.row() == self.row_offsets[0] - 1:
-                value = list(self.data[self.selectedTest][self.selectedEquipment])[0]
-            elif index.row() == self.row_offsets[1] - 1:
-                value = list(self.data[self.selectedTest][self.selectedEquipment])[1]
-            elif index.row() == self.row_offsets[2] - 1:
-                value = list(self.data[self.selectedTest][self.selectedEquipment])[2]
-        elif index.column() == 1:
-            if index.row() == self.row_offsets[0] - 1:
+            value = list(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])[index.row()]
+        else:
+            arg_list = self.get_selected_row_args(index.row())
+            if index.column() > len(arg_list):
                 value = None
-            elif index.row() == self.row_offsets[1] - 1:
-                value = None
-            elif index.row() == self.row_offsets[2] - 1:
-                value = None
-            elif index.row() < self.row_offsets[1]:
-                cmd_obj = self.data[self.selectedTest][self.selectedEquipment][list(self.data[self.selectedTest][self.selectedEquipment])[0]][index.row() - self.row_offsets[0]]
-                value = self.get_cmd_string(cmd_obj)
-            elif index.row() < self.row_offsets[2]:
-                value = self.data[self.selectedTest][self.selectedEquipment][list(self.data[self.selectedTest][self.selectedEquipment])[1]][index.row() - self.row_offsets[1]]['cmd']
             else:
-                value = self.data[self.selectedTest][self.selectedEquipment][list(self.data[self.selectedTest][self.selectedEquipment])[2]][index.row() - self.row_offsets[2]]['cmd']
+                value = arg_list[index.column() - 1]
+
         if role == QtCore.Qt.DisplayRole:
             return value
         else:
             return QtCore.QVariant()
+
+    def setData(self, index, value, role):
+        if not index.isValid():
+            return False
+        if role == QtCore.Qt.EditRole:
+            if index.column() == 0:
+                return False
+            else:
+                command = list(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])[index.row()]
+                numArgs = self.get_num_args(self.selectedTest,self.selectedEquipment,self.selectedPhase,command)
+                if numArgs > (index.column() - 1):
+                    self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase][command]['args'][0] = value
+                    return True
+                else:
+                    return False
+        return False
+
+    def flags(self, index):
+        if not index.isValid():
+            return QtCore.Qt.ItemIsEditable
+        if index.column() == 0:
+            return QtCore.QAbstractTableModel.flags(self, index) | QtCore.Qt.ItemIsSelectable
+        else:
+            return QtCore.QAbstractTableModel.flags(self, index) | QtCore.Qt.ItemIsEditable
 
     def headerData(self, section, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:

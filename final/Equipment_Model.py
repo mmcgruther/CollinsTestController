@@ -6,8 +6,8 @@ class Equipment_Model:
     {
         addr:
         {
-            --index: -1
-            --connected: 0
+            index: -1
+            connected: 0
             names: [...]
             equipment: [...]
         }
@@ -19,14 +19,27 @@ class Equipment_Model:
             self.load_json(file)
 
     def load_json(self, file):
-        infile = open(file, 'r')
-        json_obj = json.load(infile)
-        for item in json_obj:
-            address = json_obj[item]['address']
-            if address not in self.data:
-                self.data[address] = { 'index': -1, 'connected': 0, 'equipment': [], 'names': []}
-            self.data[address]['equipment'].append(json_obj[item])
-            self.data[address]['names'].append(item)
+        with open(file, 'r') as infile:
+            json_obj = json.load(infile)
+            self.raw_data = json_obj
+            for item in json_obj:
+                address = json_obj[item]['address']
+                if address not in self.data:
+                    self.data[address] = { 'index': -1, 'connected': 0, 'equipment': [], 'names': []}
+                self.data[address]['equipment'].append(json_obj[item])
+                self.data[address]['names'].append(item)
+
+    def get_equipment_command_list(self, equipment):
+        ret_list = []
+        equipment_data = self.raw_data[equipment]
+        for key in equipment_data.keys():
+            if isinstance(self.raw_data[equipment][key], dict):
+                if "cmd" in self.raw_data[equipment][key].keys():
+                    ret_list.append(key)
+        return ret_list
+
+    def get_configured_equipment_list(self):
+        return self.raw_data.keys()
 
     def get_equipment_address(self, equipment_name):
         for addr in self.data:
@@ -67,6 +80,9 @@ class Equipment_Model:
     def get_equipment_idn(self, addr):
         return self.data[addr]['equipment'][self.data[addr]['index']]['idn']
 
+    def get_equipment_idn_cmd(self, addr):
+        return self.data[addr]['equipment'][self.data[addr]['index']]['idn_cmd']
+
     def get_connected(self, addr):
         return self.data[addr]['connected']
 
@@ -75,4 +91,11 @@ class Equipment_Model:
 
     def get_connected_equipment(self, addr):
         if self.data[addr]['connected']:
-            return self.data[addr]['equipment']
+            return self.data[addr]['equipment'][self.data[addr]['index']]
+        else:
+            return None
+
+    def get_formatted_cmd_tuple(self, addr, name, args):
+        #print(self.data[addr]['equipment'][self.data[addr]['index']])
+        cmd_obj = self.data[addr]['equipment'][self.data[addr]['index']][name]
+        return cmd_obj['cmd'].format(*args), cmd_obj['type']
