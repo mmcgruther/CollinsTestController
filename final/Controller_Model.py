@@ -4,6 +4,18 @@ from final import Equipment_Model, Test_Model, Visa_Worker, IP_Table_Model
 import json, threading
 import numpy as np
 
+"""
+TODO:
+    -Fix repetitions bug
+    -Create Output Manager?
+    -Get csv file data for output manager
+    -Create tabbed window for Test config
+
+    -Documentation
+    -Refactor Connection Manager and Test Manager out of Controller Model
+    -Rename Controller Model?
+"""
+
 class Controller_Model(QtCore.QObject):
    
     def __init__(self, parent, equipment_file, tests_file, backend):
