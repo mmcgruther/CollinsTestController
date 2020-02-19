@@ -143,7 +143,7 @@ class Controller_Model(QtCore.QObject):
     def abort_test(self):
         self.signal_set_abort_button.emit(False)
         print("Main thread aborting test", threading.get_ident())
-        for equipment in self.get_test_equipment():
+        for equipment in self.test_model.get_test_equipment_list(self.selectedTest):
             self.get_worker(self.test_equipment_addr[equipment]).signal_stop.emit()
        
     @QtCore.pyqtSlot(str, str)
@@ -180,8 +180,9 @@ class Controller_Model(QtCore.QObject):
         data_array = np.array(list(map(float, data_split[1:])))
         #print(data)
         #self.plot_data.append(data)
-        self.plot_data = data_array
-        self.signal_update_canvas.emit(self.plot_data)
+        if len(data_array) > 5:
+            self.plot_data = data_array
+            self.signal_update_canvas.emit(self.plot_data)
 
     @QtCore.pyqtSlot(str, str)
     def slot_query_success(self, addr, data):

@@ -125,7 +125,7 @@
                 "Set Frequency": {
                     "name": "set_frequency",
                     "args": [
-                        "1000000"
+                        "150000000"
                     ]
                 },
                 "Set Phase": {

@@ -40,7 +40,7 @@
       ]
     },
     "reset_device": {
-      "cmd": "*RST",
+      "cmd": "*CLS",
       "type": "w",
       "default_args": []
     }
