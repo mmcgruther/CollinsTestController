@@ -21,12 +21,25 @@ class Equipment_Model:
     def load_json(self, file):
         with open(file, 'r') as infile:
             json_obj = json.load(infile)
+            self.raw_data = json_obj
             for item in json_obj:
                 address = json_obj[item]['address']
                 if address not in self.data:
                     self.data[address] = { 'index': -1, 'connected': 0, 'equipment': [], 'names': []}
                 self.data[address]['equipment'].append(json_obj[item])
                 self.data[address]['names'].append(item)
+
+    def get_equipment_command_list(self, equipment):
+        ret_list = []
+        equipment_data = self.raw_data[equipment]
+        for key in equipment_data.keys():
+            if isinstance(self.raw_data[equipment][key], dict):
+                if "cmd" in self.raw_data[equipment][key].keys():
+                    ret_list.append(key)
+        return ret_list
+
+    def get_configured_equipment_list(self):
+        return self.raw_data.keys()
 
     def get_equipment_address(self, equipment_name):
         for addr in self.data:

@@ -1,6 +1,6 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog
-from final import Controller_Model
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog
+from final import Controller_Model, Equipment_Window
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -18,10 +18,12 @@ class Main_Window(QMainWindow):
         self.controller_model.signal_set_equipment_combobox.connect(self.slot_set_equipment_combobox)
         self.controller_model.signal_set_phase_combobox.connect(self.slot_set_phase_combobox)
 
+        self.controller_model.signal_set_test_list.connect(self.slot_set_test_list)
         self.controller_model.signal_set_equipment_list.connect(self.slot_set_equipment_list)
         self.controller_model.signal_set_phase_list.connect(self.slot_set_phase_list)
 
         self.initUI()
+        self.controller_model.initialize_view()
 
     def initUI(self):
         """Lay out main window"""
@@ -29,6 +31,9 @@ class Main_Window(QMainWindow):
 
         self.refresh_button = self.findChild(QPushButton, 'refresh_button')
         self.refresh_button.clicked.connect(self.controller_model.list_resources)
+
+        self.gui_button = self.findChild(QPushButton, 'gui_button')
+        self.gui_button.clicked.connect(self.slot_open_equipment_gui)
 
         self.execute_button = self.findChild(QPushButton, 'execute_button')
         self.execute_button.clicked.connect(self.controller_model.slot_execute_test)
@@ -44,17 +49,15 @@ class Main_Window(QMainWindow):
         self.test_tableview.setModel(self.controller_model.get_test_model())
 
         self.test_combobox = self.findChild(QComboBox, 'test_combobox')
-        for test in self.controller_model.get_test_list():
-            self.test_combobox.addItem(test)
         self.test_combobox.currentIndexChanged.connect(self.controller_model.slot_change_selected_test)
+        self.controller_model.signal_set_test_index.connect(self.test_combobox.setCurrentIndex)
 
         self.equipment_combobox = self.findChild(QComboBox, 'equipment_combobox')
         self.equipment_combobox.currentIndexChanged.connect(self.controller_model.slot_change_selected_equipment)
+        self.controller_model.signal_set_equipment_index.connect(self.equipment_combobox.setCurrentIndex)
 
         self.phase_combobox = self.findChild(QComboBox, 'phase_combobox')
         self.phase_combobox.currentIndexChanged.connect(self.controller_model.slot_change_selected_phase)
-
-        self.test_combobox.currentIndexChanged.emit(0)
 
         self.graphics_view = self.findChild(QGraphicsView, 'graphics_view')
         self.figure = plt.figure()        
@@ -72,17 +75,43 @@ class Main_Window(QMainWindow):
         self.action_new_test = self.findChild(QAction, 'action_new_test')
         self.action_new_test.triggered.connect(self.slot_add_new_test)
 
+        self.action_new_equipment = self.findChild(QAction, 'action_new_equipment')
+        self.action_new_equipment.triggered.connect(self.slot_add_new_equipment)
+
+        self.action_new_command = self.findChild(QAction, 'action_new_command')
+        self.action_new_command.triggered.connect(self.slot_add_new_command)
+
+    @QtCore.pyqtSlot()
+    def slot_add_new_command(self):
+        #Dialog for new command
+        command_list = self.controller_model.get_configured_equipment_command_list()
+        item, ok = QInputDialog.getItem(self, "New Command", "Select Command:", command_list, 0, False)
+        #Check user confirmed
+        if ok:
+            name, ok = QInputDialog.getText(self, "New Command", "Select command name:")
+            if ok:
+                self.controller_model.add_new_command(item, name)
+
+    @QtCore.pyqtSlot()
+    def slot_add_new_equipment(self):
+        #Dialog for new equipment
+        equipment_list = self.controller_model.get_configured_equipment_list()
+        item, ok = QInputDialog.getItem(self, "New Equipment", "Select equipment:", equipment_list, 0, False)
+        #Check user confirmed
+        if ok:
+            #Add new equipment/check valid selection
+            self.controller_model.add_new_equipment(item)
+                
+                
+
     @QtCore.pyqtSlot()
     def slot_add_new_test(self):
         #Dialog for new test name
         name, ok = QInputDialog.getText(self, "New Test", "Test name:")
-        #Add test to model
+        #Check user confirmed
         if ok:
+            #Add test/check valid name
             self.controller_model.add_new_test(name)
-            #Select new test
-            numTests = len(self.controller_model.get_test_list())
-            #self.test_combobox.currentIndexChanged.emit(numTests - 1)
-            self.test_combobox.setCurrentIndex(numTests - 1)
 
     def slot_update_canvas(self, data):
         self.data = data
@@ -115,6 +144,13 @@ class Main_Window(QMainWindow):
         self.phase_combobox.setEnabled(state)
 
     @QtCore.pyqtSlot(list)
+    def slot_set_test_list(self, test_list):
+        self.test_combobox.clear()
+        for test in test_list:
+            self.test_combobox.addItem(test)
+
+
+    @QtCore.pyqtSlot(list)
     def slot_set_equipment_list(self, equipment_list):
         self.equipment_combobox.clear()
         for equipment in equipment_list:
@@ -129,3 +165,12 @@ class Main_Window(QMainWindow):
     @QtCore.pyqtSlot()
     def slot_open_pin_dialog(self):
         self.controller_model.set_pin_filename(QFileDialog.getOpenFileName(self,"Open file","~","CSV File (*.csv)"))
+
+    @QtCore.pyqtSlot()
+    def slot_open_equipment_gui(self):
+        self.dialog = Equipment_Window.Equipment_Window("string")
+        self.dialog.show()
+        
+
+
+        

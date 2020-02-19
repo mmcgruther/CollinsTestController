@@ -32,18 +32,49 @@ class Controller_Model(QtCore.QObject):
     signal_set_phase_combobox = QtCore.pyqtSignal(bool)
     signal_update_canvas = QtCore.pyqtSignal(object)
 
+    signal_set_test_list = QtCore.pyqtSignal(list)
     signal_set_equipment_list = QtCore.pyqtSignal(list)
     signal_set_phase_list = QtCore.pyqtSignal(list)
 
+    signal_set_test_index = QtCore.pyqtSignal(int)
+    signal_set_equipment_index = QtCore.pyqtSignal(int)
+
+    def initialize_view(self):
+        self.signal_set_test_list.emit(self.test_model.get_test_list())
+        self.slot_change_selected_test(0)
+
+    def add_new_command(self, command, commandName):
+        self.test_model.append_new_command(command, commandName, self.selectedTest, self.selectedEquipment, self.selectedPhase)
+
+
+    def get_configured_equipment_command_list(self):
+        return self.equipment_model.get_equipment_command_list(self.selectedEquipment)
+
+    def add_new_equipment(self, equipment):
+        if not self.test_model.is_equipment(self.selectedTest, equipment):
+            self.test_model.append_new_equipment(self.selectedTest, equipment)
+            equipment_list = self.test_model.get_test_equipment_list(self.selectedTest)
+            self.signal_set_equipment_list.emit(equipment_list)
+            self.signal_set_equipment_index.emit(len(equipment_list) - 1)
+
+    def get_configured_equipment_list(self):
+        return self.equipment_model.get_configured_equipment_list()
+
     def add_new_test(self, testName):
-        print(testName)
+        if not self.test_model.is_test(testName):
+            self.test_model.append_new_test(testName)
+            #Select new test
+            test_list = self.test_model.get_test_list()
+            self.signal_set_test_list.emit(test_list)
+            self.signal_set_test_index.emit(len(test_list) - 1)
+            
+        
 
     def timer_callback(self):
         print("Timer Elapsed")
         self.start_test_phase(self.executionPhase)
 
     def default_test_selection(self):
-        
         test_list = self.test_model.get_test_list()
         if len(test_list) == 0:
             self.selectedTest = None
@@ -300,7 +331,7 @@ class Controller_Model(QtCore.QObject):
     def slot_change_selected_test(self, index):
         self.selectedTest = self.test_model.get_test_list()[index]
         self.default_equipment_selection(self.selectedTest)
-        self.default_phase_selection(self.selectedTest, self.selectedEquipment)
+        #self.default_phase_selection(self.selectedTest, self.selectedEquipment)
         self.test_model.set_view_selections(self.selectedTest, self.selectedEquipment, self.selectedPhase)
         self.signal_set_equipment_list.emit(self.test_model.get_test_equipment_list(self.selectedTest))
         self.signal_set_phase_list.emit(self.phase_list)

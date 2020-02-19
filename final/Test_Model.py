@@ -50,12 +50,10 @@ class Test_Model(QtCore.QAbstractTableModel):
             newRows = len(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])
         
         row_diff = newRows - self.rowNumber
-        self.rowNumber = newRows
         if row_diff > 0:
             self.insertRows(self.parent, 0, row_diff)
         if row_diff < 0:
             self.removeRows(self.parent, 0, -row_diff)
-        self.rowNumber = newRows
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
 
     def load_json(self, file):
@@ -66,7 +64,10 @@ class Test_Model(QtCore.QAbstractTableModel):
         return list(self.data)
 
     def get_test_equipment_list(self, test):
-        return list(self.data[test])
+        ret_list = []
+        if self.data[test] is not None:
+            ret_list = list(self.data[test])
+        return ret_list
 
     def get_cmd_objs(self, test, equipment, phase):
         return self.data[test][equipment][phase]
@@ -94,6 +95,31 @@ class Test_Model(QtCore.QAbstractTableModel):
         command_name = key_list[row]
         return list(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase][command_name]['args'])
 
+    def is_test(self, testName):
+        if testName in self.data.keys():
+            return True
+        else:
+            return False
+
+    def is_equipment(self, test, equipment):
+        if equipment in self.data[test].keys():
+            return True
+        else:
+            return False
+
+    def append_new_test(self, testName):
+        self.data[testName] = {}
+
+    def append_new_equipment(self, test, equipment):
+        self.data[test][equipment] = {"config": {}, "run": {}, "reset": {}}
+
+    def append_new_command(self, command, commandName, test, equipment, phase):
+        newCommand = {"name": command, "args": []}
+        if commandName not in self.data[test][equipment][phase].keys():
+            self.data[test][equipment][phase][commandName] = newCommand
+            self.insertRows(self.parent, 0, 1)
+            self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
+
     def setData(self, data):
         self.data = data
         self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
@@ -113,12 +139,14 @@ class Test_Model(QtCore.QAbstractTableModel):
         last = row + count - 1
         self.beginInsertRows(QtCore.QModelIndex(), first, last)
         self.endInsertRows()
+        self.rowNumber += count
 
     def removeRows(self, parent, row, count):
         first = row
         last = row + count - 1
         self.beginRemoveRows(QtCore.QModelIndex(), first, last)
         self.endRemoveRows()
+        self.rowNumber -= count
 
     def columnCount(self, parent):
         return len(self.header)
