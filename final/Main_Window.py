@@ -169,6 +169,7 @@ class Main_Window(QMainWindow):
     @QtCore.pyqtSlot()
     def slot_open_equipment_gui(self):
         self.dialog = Equipment_Window.Equipment_Window("string")
+        self.dialog.signal_set_gui_commands.connect(self.controller_model.slot_set_test_commands)
         self.dialog.show()
         
 

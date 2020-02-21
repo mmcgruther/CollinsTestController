@@ -149,7 +149,7 @@
                 }
             }
         },
-        "Spectrum Analyzer": {
+        "Rigol Spectrum Analyzer": {
             "config": {
                 "Set Center Frequency": {
                     "name": "set_center_freq",

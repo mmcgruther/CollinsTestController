@@ -22,7 +22,7 @@ class Controller_Test(unittest.TestCase):
         QTest.mouseClick(self.main_window.refresh_button, Qt.LeftButton)
         QTest.qWait(1000)
         QTest.mouseClick(self.main_window.execute_button, Qt.LeftButton)
-        QTest.qWait(2000)
+        QTest.qWait(12000)
 
 if __name__ == "__main__":
     unittest.main()

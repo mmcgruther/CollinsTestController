@@ -6,13 +6,12 @@ import numpy as np
 
 """
 TODO:
-    -Fix repetitions bug
     -Create Output Manager?
     -Get csv file data for output manager
     -Create tabbed window for Test config
 
     -Documentation
-    -Refactor Connection Manager and Test Manager out of Controller Model
+    -Refactor Connection Manager, Test Manager, Worker Pool out of Controller Model
     -Rename Controller Model?
 """
 
@@ -56,7 +55,7 @@ class Controller_Model(QtCore.QObject):
         self.slot_change_selected_test(0)
 
     def add_new_command(self, command, commandName):
-        self.test_model.append_new_command(command, commandName, self.selectedTest, self.selectedEquipment, self.selectedPhase)
+        self.test_model.append_new_command(self.selectedTest, self.selectedEquipment, self.selectedPhase, commandName, command)
 
 
     def get_configured_equipment_command_list(self):
@@ -196,9 +195,9 @@ class Controller_Model(QtCore.QObject):
             self.plot_data = data_array
             self.signal_update_canvas.emit(self.plot_data)
 
-    @QtCore.pyqtSlot(str, str)
-    def slot_query_success(self, addr, data):
-        print("Data received from", addr, "type:", type(data), "data:", data)
+    @QtCore.pyqtSlot(str, str, int)
+    def slot_query_success(self, addr, data, qID):
+        print("Data received from", addr, "type:", type(data), "cmd ID:", qID, "data:", data)
         equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
         self.update_output(data)
         self.next_command(equipment)
@@ -229,7 +228,6 @@ class Controller_Model(QtCore.QObject):
 
     def start_test_phase(self, phase):
         self.executionPhase = phase
-        #self.reset_test_index()
         self.test_index_by_equipment = {}
         self.cmd_tuple_lists_by_equipment  = {}
         for equipment in self.test_model.get_test_equipment_list(self.selectedTest):
@@ -257,10 +255,11 @@ class Controller_Model(QtCore.QObject):
         else:
             addr = self.test_equipment_addr[equipment]
             cmd, cmd_type =self.cmd_tuple_lists_by_equipment[equipment][self.test_index_by_equipment[equipment]]
+            qID = self.test_index_by_equipment[equipment]
             if cmd_type == 'w':
                 self.get_worker(addr).signal_write.emit(cmd)
             elif cmd_type == 'q':
-                self.get_worker(addr).signal_query.emit(cmd)
+                self.get_worker(addr).signal_query.emit(cmd, qID)
 
     def create_worker(self, addr):
         w = Visa_Worker.Visa_Worker(addr, self.backend)
@@ -292,7 +291,6 @@ class Controller_Model(QtCore.QObject):
         """Tracks when worker threads have completed test phase"""
         self.workersResponded += 1
         if self.workersResponded == len(self.test_equipment_addr):
-            print("End of", self.executionPhase, "phase")
             #self.reset_test_index()
 
             if self.executionPhase == 'config':
@@ -302,16 +300,18 @@ class Controller_Model(QtCore.QObject):
                 self.timer.setInterval(self.runPeriod)
                 if self.runRepetitions > 0:
                     self.timer.start()
+                    self.runCounter = 0
                 self.start_test_phase(self.executionPhase)
 
             elif self.executionPhase == 'run':
                 self.runCounter += 1
+                print("Run iteration", self.runCounter, "complete")
                 if self.runRepetitions > self.runCounter:
-                    print("Run iteration", self.runCounter, "complete")
                     self.workersResponded = 0
                     
                 else:
                     self.timer.stop()
+                    print("End of", self.executionPhase, "phase")
                     self.executionPhase = 'reset'
                     self.workersResponded = 0
                     print("Starting reset phase")
@@ -394,6 +394,13 @@ class Controller_Model(QtCore.QObject):
             return self.test_model.get_next_reset_command(equipment)
         else:
             pass
+
+    @QtCore.pyqtSlot(list)
+    def slot_set_test_commands(self, cmdTupleList):
+        #list of tuples: (phase, cmdName, cmd, args)
+        for phase, cmdName, cmd, args in cmdTupleList:
+            self.test_model.set_command(self.selectedTest, self.selectedEquipment, self.selectedPhase, cmdName, cmd, args)
+
     def __del__(self):
         if self.workersInit:  
             for addr in self.get_addr_list():

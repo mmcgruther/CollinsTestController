@@ -103,7 +103,7 @@
       "args": []
     }
   },
-  "Spectrum Analyzer": {
+  "Rigol Spectrum Analyzer": {
     "address": "TCPIP0::192.168.1.30::INSTR",
     "idn": "Rigol Technologies,DSA1030A,DSA1A150400015,00.01.14.00.00",
     "timeout": 1000,
