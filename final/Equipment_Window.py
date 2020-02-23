@@ -16,12 +16,10 @@ class Equipment_Window(QMainWindow):
     @QtCore.pyqtSlot()
     def get_commands(self):
         GUI_data = []
-
-        state = self.findChild(QRadioButton, 'radioButton').isChecked()
-        name = "Set Center Frequency"
-        value = [self.findChild(QDoubleSpinBox, 'doubleSpinBox').text()]
-        phase = 'config'
-        cmd = "set_center_freq"
+        name = "Set Center Frequency"#Should match existing name in tests.json
+        value = [self.findChild(QDoubleSpinBox, 'doubleSpinBox').text()]#list of parameters [1]
+        phase = 'config'#Match phase from tests.json
+        cmd = "set_center_freq"#Needs to match equipment.json command
         #list of tuples: (phase, cmdName, cmd, args)
         if state:
             GUI_data.append((phase, name, cmd, value))

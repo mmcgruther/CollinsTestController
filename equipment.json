@@ -169,27 +169,47 @@
 	    "default_args": []
     },
     "get_peak": {
-    	"cmd": ":TRACe:MATH:PEAK?",
-	"type": "q",
-	"default_args": []
+      "cmd": ":TRACe:MATH:PEAK?",
+      "type": "q",
+      "default_args": []
     }
   },
-  "equipment4": {
-    "address": "TCPIP::192.168.1.2::10001::SOCKET",
-    "idn": "TEKTRONIX,AFG3102,C100101,SCPI:99.0 FV:1.0",
+  "Agilent Signal Generator": {
+    "address": "TCPIP0::192.168.1.40::INSTR",
+    "idn": "Agilent Technologies, N5181B, MY53050099, B.01.51",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
     "write_termination": "\n",
     "read_termination": "\n",
-    "param_1": {
-      "method": "set_lineedit",
-      "name": "Param 1:",
-      "command": "Param 1 String"
+    "set_list_pow": {
+      "cmd": ":LIST:POW {0}",
+      "type": "w",
+      "default_args": "-30"
     },
-    "param_2": {
-      "method": "set_lineedit",
-      "name": "Param 2:",
-      "command": "Param 2 String"
+    "set_list_freq": {
+      "cmd": ":LIST:FREQ {0}",
+      "type": "w",
+      "default_args": "1GHz"
+    },
+    "set_list_dwell": {
+      "cmd": ":LIST:DWEL1 {0}",
+      "type": "w",
+      "default_args": "1"
+    },
+    "set_list_retrace": {
+      "cmd": ":LIST:RETRace {0}",
+      "type": "w",
+      "default_args": "ON"
+    },
+    "set_list_type": {
+      "cmd": ":LIST:TYPE {0}",
+      "type": "w",
+      "default_args": "LIST"
+    },
+    "set_output": {
+      "cmd": ":OUTPut {0}",
+      "type": "w",
+      "default_args": "OFF"
     }
   }
 }
