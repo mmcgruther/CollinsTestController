@@ -61,12 +61,6 @@ class Equipment_Model:
     def get_addr_list(self):
         return list(self.data)
 
-    def set_worker(self, worker, addr):
-        self.data[addr]['worker'] = worker
-
-    def get_worker(self, addr):
-        return self.data[addr]['worker']
-
     def reset_index(self, addr):
         self.data[addr]['index'] = -1
 
@@ -76,6 +70,12 @@ class Equipment_Model:
         if not valid_index:
             self.reset_index(addr)
         return not valid_index
+
+    def get_equipment_read_termination(self, addr):
+        return self.data[addr]['equipment'][self.data[addr]['index']]['read_termination']
+
+    def get_equipment_write_termination(self, addr):
+        return self.data[addr]['equipment'][self.data[addr]['index']]['write_termination']
 
     def get_equipment_idn(self, addr):
         return self.data[addr]['equipment'][self.data[addr]['index']]['idn']

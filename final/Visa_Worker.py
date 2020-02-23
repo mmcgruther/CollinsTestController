@@ -13,7 +13,7 @@ class Visa_Worker(QtCore.QObject):
         self.connected = False
         self.running = False
 
-    signal_connect = QtCore.pyqtSignal(str)
+    signal_connect = QtCore.pyqtSignal(str, str, str)
     signal_write = QtCore.pyqtSignal(str)
     signal_query = QtCore.pyqtSignal(str, int)
     signal_connected = QtCore.pyqtSignal(str, str)
@@ -24,11 +24,11 @@ class Visa_Worker(QtCore.QObject):
     signal_query_success = QtCore.pyqtSignal(str, str, int)
     signal_error = QtCore.pyqtSignal(str, str)
 
-    @QtCore.pyqtSlot(str)
-    def slot_connect(self, cmd):
+    @QtCore.pyqtSlot(str, str, str)
+    def slot_connect(self, cmd, w_term, r_term):
         print(threading.get_ident(), "Connecting to", self.addr)
             
-        if self.session.connect():
+        if self.session.connect(w_term, r_term):
             print(threading.get_ident(), "Connection failure", self.addr)
             self.connected = False
             self.signal_not_connected.emit(self.addr)

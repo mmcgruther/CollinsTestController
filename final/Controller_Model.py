@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QTimer
 from final import Equipment_Model, Test_Model, Visa_Worker, IP_Table_Model
+from final.worker_pool import Worker_Pool
 import json, threading
 import numpy as np
 
@@ -11,7 +12,7 @@ TODO:
     -Create tabbed window for Test config
 
     -Documentation
-    -Refactor Connection Manager, Test Manager, Worker Pool out of Controller Model
+    -Refactor Connection Manager, Test Manager out of Controller Model
     -Rename Controller Model?
 """
 
@@ -21,13 +22,12 @@ class Controller_Model(QtCore.QObject):
         super(Controller_Model, self).__init__()
         self.equipment_model = Equipment_Model.Equipment_Model(equipment_file)
         self.test_model = Test_Model.Test_Model(self, tests_file)
+        self.worker_pool = Worker_Pool(self, backend)
         self.selectedTest = None
         self.selectedEquipment = None
         self.selectedPhase = None
         self.default_test_selection()
         self.ip_table_model = IP_Table_Model.IP_Table_Model(self, self.equipment_model.get_IP_table_data())
-        self.backend = backend
-        self.workersInit = False
         self.phase_list = ['config','run','reset']
         self.runRepetitions = 10
         self.runPeriod = 1000
@@ -117,13 +117,19 @@ class Controller_Model(QtCore.QObject):
         for addr in self.get_addr_list():
             self.equipment_model.reset_index(addr)
             self.set_connected(addr, 2)
-            
-            if not self.workersInit:  
-                self.equipment_model.set_worker(self.create_worker(addr), addr)         
+
+            if not self.worker_pool.is_init():
+                w = self.worker_pool.create_worker(addr)
+                #Signals from worker
+                w.signal_write_success.connect(self.slot_write_success)
+                w.signal_connected.connect(self.slot_connected)
+                w.signal_not_connected.connect(self.slot_not_connected)
+                w.signal_query_success.connect(self.slot_query_success)
+                w.signal_error.connect(self.slot_error)
 
             self.next_connection(addr)
  
-        self.workersInit = True
+        self.worker_pool.set_init(True)
         self.ip_table_model.setData(self.equipment_model.get_IP_table_data())
 
     @QtCore.pyqtSlot()
@@ -146,7 +152,7 @@ class Controller_Model(QtCore.QObject):
         self.workersResponded = 0
         print("Main thread starting test", threading.get_ident())
         for equipment in self.test_model.get_test_equipment_list(self.selectedTest):
-            self.get_worker(self.test_equipment_addr[equipment]).signal_start.emit()
+            self.worker_pool.get_worker(self.test_equipment_addr[equipment]).signal_start.emit()
         self.init_output()
         self.start_test_phase('config')
 
@@ -155,7 +161,7 @@ class Controller_Model(QtCore.QObject):
         self.signal_set_abort_button.emit(False)
         print("Main thread aborting test", threading.get_ident())
         for equipment in self.test_model.get_test_equipment_list(self.selectedTest):
-            self.get_worker(self.test_equipment_addr[equipment]).signal_stop.emit()
+            self.worker_pool.get_worker(self.test_equipment_addr[equipment]).signal_stop.emit()
        
     @QtCore.pyqtSlot(str, str)
     def slot_connected(self, addr, name):
@@ -213,7 +219,9 @@ class Controller_Model(QtCore.QObject):
         self.set_connected(addr, 2)
         if not self.increment_equipment(addr):
             self.equipment_model.get_equipment_idn_cmd(addr)
-            self.get_worker(addr).signal_connect.emit(self.equipment_model.get_equipment_idn_cmd(addr))
+            w_term = self.equipment_model.get_equipment_write_termination(addr)
+            r_term = self.equipment_model.get_equipment_read_termination(addr)
+            self.worker_pool.get_worker(addr).signal_connect.emit(self.equipment_model.get_equipment_idn_cmd(addr), w_term, r_term)
             return False
         else:
             print(addr, ": No connection found")
@@ -257,28 +265,9 @@ class Controller_Model(QtCore.QObject):
             cmd, cmd_type =self.cmd_tuple_lists_by_equipment[equipment][self.test_index_by_equipment[equipment]]
             qID = self.test_index_by_equipment[equipment]
             if cmd_type == 'w':
-                self.get_worker(addr).signal_write.emit(cmd)
+                self.worker_pool.get_worker(addr).signal_write.emit(cmd)
             elif cmd_type == 'q':
-                self.get_worker(addr).signal_query.emit(cmd, qID)
-
-    def create_worker(self, addr):
-        w = Visa_Worker.Visa_Worker(addr, self.backend)
-        w.w_thread = QtCore.QThread()
-        w.w_thread.start()
-
-        w.signal_connect.connect(w.slot_connect)
-        w.signal_write.connect(w.slot_write)
-        w.signal_write_success.connect(self.slot_write_success)
-        w.signal_connected.connect(self.slot_connected)
-        w.signal_not_connected.connect(self.slot_not_connected)
-        w.signal_start.connect(w.slot_start)
-        w.signal_query.connect(w.slot_query)
-        w.signal_query_success.connect(self.slot_query_success)
-        w.signal_stop.connect(w.slot_stop)
-        w.signal_error.connect(self.slot_error)
-
-        w.moveToThread(w.w_thread)
-        return w
+                self.worker_pool.get_worker(addr).signal_query.emit(cmd, qID)
 
     def connection_responded(self):
         self.ip_table_model.setData(self.equipment_model.get_IP_table_data())
@@ -291,8 +280,6 @@ class Controller_Model(QtCore.QObject):
         """Tracks when worker threads have completed test phase"""
         self.workersResponded += 1
         if self.workersResponded == len(self.test_equipment_addr):
-            #self.reset_test_index()
-
             if self.executionPhase == 'config':
                 self.executionPhase = 'run'
                 self.workersResponded = 0
@@ -344,7 +331,6 @@ class Controller_Model(QtCore.QObject):
     def slot_change_selected_test(self, index):
         self.selectedTest = self.test_model.get_test_list()[index]
         self.default_equipment_selection(self.selectedTest)
-        #self.default_phase_selection(self.selectedTest, self.selectedEquipment)
         self.test_model.set_view_selections(self.selectedTest, self.selectedEquipment, self.selectedPhase)
         self.signal_set_equipment_list.emit(self.test_model.get_test_equipment_list(self.selectedTest))
         self.signal_set_phase_list.emit(self.phase_list)
@@ -367,9 +353,6 @@ class Controller_Model(QtCore.QObject):
 
     def get_equipment_address(self, equipment_name):
         return self.equipment_model.get_equipment_address(equipment_name)
-
-    def get_worker(self, addr):
-        return self.equipment_model.get_worker(addr)
 
     def get_addr_list(self):
         return self.equipment_model.get_addr_list()
@@ -400,8 +383,3 @@ class Controller_Model(QtCore.QObject):
         #list of tuples: (phase, cmdName, cmd, args)
         for phase, cmdName, cmd, args in cmdTupleList:
             self.test_model.set_command(self.selectedTest, self.selectedEquipment, self.selectedPhase, cmdName, cmd, args)
-
-    def __del__(self):
-        if self.workersInit:  
-            for addr in self.get_addr_list():
-                self.get_worker(addr).w_thread.terminate()

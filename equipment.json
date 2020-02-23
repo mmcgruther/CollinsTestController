@@ -4,6 +4,8 @@
     "idn": "Rigol Technologies,DG4162,DG4C151300243,00.01.04",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
     "set_output": {
       "cmd": ":OUTPUT {0}",
       "type": "w",
@@ -50,6 +52,8 @@
     "idn": "TEKTRONIX,DPO3034,C013408,CF:91.1CT FV:v2.23 ",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
     "data_init": {
       "type": "w",
       "cmd": "Data {0}",
@@ -108,6 +112,8 @@
     "idn": "Rigol Technologies,DSA1030A,DSA1A150400015,00.01.14.00.00",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
     "set_center_freq": {
       "cmd": ":SENS:FREQ:CENT {0}",
       "type": "w",
@@ -173,6 +179,8 @@
     "idn": "TEKTRONIX,AFG3102,C100101,SCPI:99.0 FV:1.0",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
     "param_1": {
       "method": "set_lineedit",
       "name": "Param 1:",

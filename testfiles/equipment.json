@@ -4,6 +4,8 @@
     "idn": "TEKTRONIX, DMM4050, nnnnnnnm, mm/dd/yy tt:tt",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
     "data_source": {
       "cmd": "DATA:SOU {0}",
       "type": "w",
@@ -55,6 +57,8 @@
     "idn": "TEK/DPO3034,CF:91.1CT,FV:v1.0000",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
     "data_source": {
       "cmd": "DATA:SOU {0}",
       "type": "w",
@@ -106,6 +110,8 @@
     "idn": "Keysight Technologies, N9320B, 45310116, A.01.02",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
     "param_1": {
       "method": "set_lineedit",
       "name": "Param 1:",
@@ -122,6 +128,8 @@
     "idn": "TEKTRONIX,AFG3102,C100101,SCPI:99.0 FV:1.0",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
     "param_1": {
       "method": "set_lineedit",
       "name": "Param 1:",
