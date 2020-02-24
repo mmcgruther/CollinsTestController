@@ -5,6 +5,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import sys, time, json
+import pandas as pd
 
 class Main_Window(QMainWindow):
     def __init__(self, equipment_file = "equipment.json", tests_file = "tests.json", backend = "@py"):
@@ -116,7 +117,20 @@ class Main_Window(QMainWindow):
     def slot_update_canvas(self, data):
         self.data = data
         plt.clf()
-        plt.plot(self.data)
+        plt.subplot(121)
+        #plt.plot(self.data)
+        d = {'x{}'.format(i): range(30) for i in range(10)}
+        table = pd.DataFrame(d)
+        plt.plot([1,2,4,8,12,14,15])
+
+        plt.subplot(122)
+
+        cell_text = []
+        for row in range(len(table)):
+            cell_text.append(table.iloc[row])
+
+        plt.table(cellText=cell_text, colLabels=table.columns, loc='center')
+        plt.axis('off')
         self.canvas.draw()
 
     @QtCore.pyqtSlot(bool)

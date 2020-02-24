@@ -33,7 +33,6 @@ class Worker_Pool(QtCore.QObject):
         return w
     
     def get_worker(self, addr):
-        print(self.pool.keys())
         return self.pool[addr]
 
     def __del__(self):

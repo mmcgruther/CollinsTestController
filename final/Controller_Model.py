@@ -197,9 +197,9 @@ class Controller_Model(QtCore.QObject):
         data_array = np.array(list(map(float, data_split[1:])))
         #print(data)
         #self.plot_data.append(data)
-        if len(data_array) > 5:
-            self.plot_data = data_array
-            self.signal_update_canvas.emit(self.plot_data)
+        #if len(data_array) > 5:
+        self.plot_data = data_array
+        self.signal_update_canvas.emit(self.plot_data)
 
     @QtCore.pyqtSlot(str, str, int)
     def slot_query_success(self, addr, data, qID):

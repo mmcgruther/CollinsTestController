@@ -16,6 +16,7 @@ class Equipment_Window(QMainWindow):
     @QtCore.pyqtSlot()
     def get_commands(self):
         GUI_data = []
+        state = self.findChild(QRadioButton, 'radioButton').isChecked()
         name = "Set Center Frequency"#Should match existing name in tests.json
         value = [self.findChild(QDoubleSpinBox, 'doubleSpinBox').text()]#list of parameters [1]
         phase = 'config'#Match phase from tests.json
