@@ -191,21 +191,21 @@ class Controller_Model(QtCore.QObject):
     def init_output(self):
         self.plot_data = []
 
-    def update_output(self, str_data):
+    def update_output(self, str_data, addr, qID):
         #data = float(str_data)
         data_split = str_data.split(',')
         data_array = np.array(list(map(float, data_split[1:])))
         #print(data)
         #self.plot_data.append(data)
-        #if len(data_array) > 5:
-        self.plot_data = data_array
-        self.signal_update_canvas.emit(self.plot_data)
+        if qID == 0:
+            self.plot_data = data_array
+            self.signal_update_canvas.emit(self.plot_data)
 
     @QtCore.pyqtSlot(str, str, int)
     def slot_query_success(self, addr, data, qID):
         print("Data received from", addr, "type:", type(data), "cmd ID:", qID, "data:", data)
         equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
-        self.update_output(data)
+        self.update_output(data, addr, qID)
         self.next_command(equipment)
 
     @QtCore.pyqtSlot(str, str)
