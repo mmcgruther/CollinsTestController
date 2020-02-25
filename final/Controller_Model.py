@@ -4,10 +4,12 @@ from final import Equipment_Model, Test_Model, Visa_Worker, IP_Table_Model
 from final.worker_pool import Worker_Pool
 import json, threading
 import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
 
 """
 TODO:
-    -Create Output Manager?
+    -Create Output Manager to format data output per test
     -Get csv file data for output manager
     -Create tabbed window for Test config
 
@@ -190,16 +192,46 @@ class Controller_Model(QtCore.QObject):
 
     def init_output(self):
         self.plot_data = []
+        #self.table_data = np.array()
+        self.df = pd.DataFrame(columns=["Peak Frequency", "Peak Amplitude"])
+        self.figure = plt.gcf()
+        self.subplot1 = self.figure.add_subplot(121)
+        self.subplot2 = self.figure.add_subplot(122)
 
     def update_output(self, str_data, addr, qID):
-        #data = float(str_data)
-        data_split = str_data.split(',')
-        data_array = np.array(list(map(float, data_split[1:])))
-        #print(data)
-        #self.plot_data.append(data)
+        """
+        TODO: 
+        -Create Output Manager to format data output per test
+        """
+        #plt.clf()
+
         if qID == 0:
-            self.plot_data = data_array
-            self.signal_update_canvas.emit(self.plot_data)
+            #plt.subplot(121)
+            self.subplot1.cla()
+            data_split = str_data.split(',')
+            data_array = np.array(list(map(float, data_split[1:])))
+            self.subplot1.plot(data_array)
+            self.plot_data.append(data_array)
+
+        if qID == 1:
+            #plt.subplot(122)
+            self.subplot2.cla()
+            data_split = str_data.split(',')
+            data_array = np.array(list(map(float, data_split)))
+            print(data_array)
+            table = pd.DataFrame({"Peak Frequency": [data_array[0]], "Peak Amplitude": [data_array[1]]})
+            self.df = self.df.append(table, ignore_index=True)
+            #d = {'x{}'.format(i): range(30) for i in range(10)}
+
+            
+            print(self.df)
+            cell_text = []
+            for row in range(len(self.df)):
+                cell_text.append(self.df.iloc[row])
+            self.subplot2.table(cellText=cell_text, colLabels=self.df.columns, loc='center')
+            self.subplot2.axis('off')
+
+        self.signal_update_canvas.emit(self.figure)
 
     @QtCore.pyqtSlot(str, str, int)
     def slot_query_success(self, addr, data, qID):

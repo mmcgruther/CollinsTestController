@@ -43,6 +43,11 @@
                 {
                     "name": "get_imm_ampl",
                     "args": []
+                },
+                "Get Frequency":
+                {
+                    "name": "get_freq",
+                    "args": []
                 }
             },
             "reset": {
@@ -92,11 +97,6 @@
                 }
             },
             "run": {
-                "Get Immediate Amplitude":
-                {
-                    "name": "get_imm_ampl",
-                    "args": []
-                }
             },
             "reset": {
                 "Clear Device":

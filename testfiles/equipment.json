@@ -46,6 +46,11 @@
       "cmd": ":VOLT:IMM:AMPL?",
       "default_args": []
     },
+    "get_freq": {
+      "type": "q",
+      "cmd": "?FREQ",
+      "default_args": []
+    },
     "clear_device": {
       "type": "w",
       "cmd": "*CLS",
