@@ -195,8 +195,8 @@ class Controller_Model(QtCore.QObject):
         #self.table_data = np.array()
         self.df = pd.DataFrame(columns=["Peak Frequency", "Peak Amplitude"])
         self.figure = plt.gcf()
-        self.subplot1 = self.figure.add_subplot(121)
-        self.subplot2 = self.figure.add_subplot(122)
+        self.subplot1 = self.figure.add_subplot(211)
+        self.subplot2 = self.figure.add_subplot(212)
 
     def update_output(self, str_data, addr, qID):
         """
@@ -235,9 +235,10 @@ class Controller_Model(QtCore.QObject):
 
     @QtCore.pyqtSlot(str, str, int)
     def slot_query_success(self, addr, data, qID):
-        print("Data received from", addr, "type:", type(data), "cmd ID:", qID, "data:", data)
+        print("Data received from", addr, "type:", type(data), "cmd ID:", qID)
         equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
-        self.update_output(data, addr, qID)
+        if len(data) != 0:
+            self.update_output(data, addr, qID)
         self.next_command(equipment)
 
     @QtCore.pyqtSlot(str, str)

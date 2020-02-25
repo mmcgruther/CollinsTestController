@@ -13,12 +13,18 @@ class Visa_Session:
             failure = True
         return failure
 
+    def close(self):
+        try:
+            self.device.close()
+        except:
+            pass
+
     def query(self, cmd, *args):
         response = None
         try:
             response = self.device.query(cmd)
-        except:
-            pass
+        except Exception as  e:
+            print(e)
         return response
 
     def write(self, cmd, *args):

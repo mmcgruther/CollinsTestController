@@ -21,6 +21,7 @@ class Worker_Pool(QtCore.QObject):
         w.w_thread.start()
 
         w.signal_connect.connect(w.slot_connect)
+        w.signal_disconnect.connect(w.slot_disconnect)
         w.signal_write.connect(w.slot_write)
 
         #Signals to worker

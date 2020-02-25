@@ -65,7 +65,6 @@ class Main_Window(QMainWindow):
         self.figure = plt.figure(facecolor='black')        
         self.figure.set_facecolor("none")
         self.canvas = FigureCanvas(self.figure)
-        self.canvas.setStyleSheet("background-color:blue;")
         self.vboxlayout.addWidget(self.canvas)
         """self.scene = QGraphicsScene(self.graphics_view)
         self.scene.addWidget(self.canvas)
@@ -90,7 +89,7 @@ class Main_Window(QMainWindow):
         self.action_exit = self.findChild(QAction, 'action_exit')
         self.action_exit.triggered.connect(self.close)
 
-        self.showFullScreen()
+        self.showMaximized()
 
     @QtCore.pyqtSlot()
     def slot_add_new_command(self):
