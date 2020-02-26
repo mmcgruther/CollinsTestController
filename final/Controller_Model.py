@@ -32,6 +32,7 @@ class Controller_Model(QtCore.QObject):
         self.ip_table_model = IP_Table_Model.IP_Table_Model(self, self.equipment_model.get_IP_table_data())
         self.phase_list = ['config','run','reset']
         self.runRepetitions = 10
+        self.configdelay = 500
         self.runPeriod = 1000
         self.runCounter = 0
         self.timer = QTimer(self)
@@ -84,7 +85,12 @@ class Controller_Model(QtCore.QObject):
         
 
     def timer_callback(self):
-        print("Timer Elapsed")
+        
+        if self.executionPhase == 'config':
+            self.executionPhase = 'run'
+            self.timer.setInterval(self.runPeriod)
+            print("Begin run phase")
+        
         self.start_test_phase(self.executionPhase)
 
     def default_test_selection(self):
@@ -203,10 +209,8 @@ class Controller_Model(QtCore.QObject):
         TODO: 
         -Create Output Manager to format data output per test
         """
-        #plt.clf()
 
         if qID == 0:
-            #plt.subplot(121)
             self.subplot1.cla()
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split[1:])))
@@ -214,17 +218,13 @@ class Controller_Model(QtCore.QObject):
             self.plot_data.append(data_array)
 
         if qID == 1:
-            #plt.subplot(122)
             self.subplot2.cla()
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split)))
-            print(data_array)
             table = pd.DataFrame({"Peak Frequency": [data_array[0]], "Peak Amplitude": [data_array[1]]})
             self.df = self.df.append(table, ignore_index=True)
-            #d = {'x{}'.format(i): range(30) for i in range(10)}
 
-            
-            print(self.df)
+            #print(self.df)
             cell_text = []
             for row in range(len(self.df)):
                 cell_text.append(self.df.iloc[row])
@@ -314,14 +314,12 @@ class Controller_Model(QtCore.QObject):
         self.workersResponded += 1
         if self.workersResponded == len(self.test_equipment_addr):
             if self.executionPhase == 'config':
-                self.executionPhase = 'run'
+                
                 self.workersResponded = 0
-                print("Starting run phase")
-                self.timer.setInterval(self.runPeriod)
-                if self.runRepetitions > 0:
-                    self.timer.start()
-                    self.runCounter = 0
-                self.start_test_phase(self.executionPhase)
+                print("Config complete")
+                self.timer.setInterval(self.configdelay)
+                self.timer.start()
+                self.runCounter = 0
 
             elif self.executionPhase == 'run':
                 self.runCounter += 1

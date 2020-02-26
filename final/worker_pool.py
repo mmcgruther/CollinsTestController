@@ -39,5 +39,5 @@ class Worker_Pool(QtCore.QObject):
     def __del__(self):
         if self.init:  
             for key in self.pool.keys():
-                self.pool[key].w_thread.terminate()
-                #self.get_worker(addr).w_thread.terminate()
+                self.pool[key].w_thread.exit()
+                self.pool[key].w_thread.wait()

@@ -45,6 +45,7 @@ class Visa_Worker(QtCore.QObject):
             
     @QtCore.pyqtSlot()
     def slot_disconnect(self):
+        print(threading.get_ident(), "Disconnecting from", self.addr)
         if self.connected:
             self.connected = False
             self.session.close()
