@@ -188,5 +188,94 @@
             },
             "reset": {}
         }
+    },
+    "Pin vs Poutv2": {
+        "Agilent Signal Generator": {
+            "config": {
+                "Set Freq List": {
+                    "name": "set_list_freq",
+		    "args": [
+			    "500MHz,500MHz, 500MHz, 600MHz, 600MHz, 600MHz,700MHz, 700MHz, 700MHz"
+		    ]
+		},
+                "Set Power List": {
+                    "name": "set_list_pow",
+		    "args": [
+			    "-10,-9,-8,-10,-9,-8,-10,-8,-9"
+		 	]
+		},
+                "Set Dwell List": {
+                    "name": "set_list_dwell",
+		    "args": [
+			    "2,2,2,2,2,2,2,2,2"
+		    ]
+	    	},
+                "Set Sweep Type": {
+                    "name": "set_list_type",
+		    "args": [
+			    "LIST"
+		    ]
+		},
+                "Set Power Sweep Type": {
+                    "name": "set_pow_mode",
+		    "args": [
+			    "LIST"
+		    ]
+		},
+                "Set Freq Sweep Type": {
+                    "name": "set_freq_mode",
+		    "args": [
+			    "LIST"
+		    ]
+		},
+                "Enable Output": {
+                    "name": "set_output",
+		    "args": [
+			    "ON"
+		    ]
+		}
+	    },
+	    "run":{},
+	    "reset":{}
+	},
+        "Rigol Spectrum Analyzer": {
+            "config": {
+                "Set Center Frequency": {
+                    "name": "set_center_freq",
+                    "args": [
+                        "500MHZ"
+                    ]
+                },
+                "Set Frequency Span": {
+                    "name": "set_span_freq",
+                    "args": [
+                        "700MHZ"
+                    ]
+                },
+                "Enable Peak Table State": {
+                    "name": "set_peak_table_state",
+                    "args": [
+                        "ON"
+                    ]
+                },
+                "Set Peak Sort Ampl": {
+                    "name": "set_peak_sort",
+                    "args": [
+                        "AMPL"
+                    ]
+                }
+            },
+            "run": {
+                "Get Trace": {
+                    "name": "get_trace",
+                    "args": []
+                },
+                "Get Peak": {
+                    "name": "get_peak",
+                    "args": []
+                }
+            },
+            "reset": {}
+	}
     }
 }

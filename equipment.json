@@ -109,7 +109,7 @@
   },
   "Rigol Spectrum Analyzer": {
     "address": "TCPIP0::192.168.1.30::INSTR",
-    "idn": "Rigol Technologies,DSA1030A,DSA1A150400015,00.01.14.00.00",
+    "idn": "Rigol Technologies,DSA1030A,DSA1A143200146,00.01.14.00.00",
     "timeout": 1000,
     "idn_cmd": "*IDN?",
     "write_termination": "\n",
@@ -210,6 +210,16 @@
       "cmd": ":OUTPut {0}",
       "type": "w",
       "default_args": "OFF"
+    },
+    "set_pow_mode": {
+      "cmd": ":POWer:MODE {0}",
+      "type": "w",
+      "default_args": "LIST"
+    },
+    "set_freq_mode": {
+      "cmd": ":FREQ:MODE {0}",
+      "type": "w",
+      "default_args": "LIST"
     }
   }
 }

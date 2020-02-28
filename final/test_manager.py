@@ -27,7 +27,7 @@ class Test_Manager(QtCore.QObject):
         self.timer = QTimer(self)
         self.runRepetitions = 10
         self.configdelay = 500
-        self.runPeriod = 1000
+        self.runPeriod = 2000
         self.runCounter = 0
         self.timer.timeout.connect(self.timer_callback)
 

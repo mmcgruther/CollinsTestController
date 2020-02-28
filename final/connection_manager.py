@@ -72,7 +72,7 @@ class Connection_Manager(QtCore.QObject):
             self.equipment_model.set_connected(addr, 1)
             self.connection_responded()
         else:
-            print(addr, ": Incorrect IDN", name, ", expected",self.get_equipment_idn(addr))
+            print(addr, ": Incorrect IDN", name, ", expected",self.equipment_model.get_equipment_idn(addr))
             if self.next_connection(addr):
                 self.connection_responded()
             else:
