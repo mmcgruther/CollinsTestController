@@ -23,7 +23,7 @@ class Visa_Session:
         response = None
         try:
             response = self.device.query(cmd)
-        except Exception as  e:
+        except Exception as e:
             print(e)
         return response
 
