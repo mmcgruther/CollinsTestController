@@ -3,6 +3,7 @@ import sys
 import pandas as pd 
 import numpy as np 
 import matplotlib.pyplot as plt
+from csv import writer 
 
 #convert string input array into integers for display
 #create the plot in the GUI canvas space and not plot.show
@@ -31,11 +32,14 @@ class output:
         plt.ylabel(colnames[1])
         plt.show()
     
-    def save_data(self, final): #pass the dic final to this function after last call
-        final.to_csv(r'C:\Users\Demilade\Documents\4806\test1.csv')
+    def save_data(self,file_name, final): #pass the dic final to this function after last call
+        #final.to_csv(r'C:\Users\Demilade\Documents\4806\test1.csv')
+        with open(file_name, 'a+', newline='') as write_obj:
+            csv_writer = writer(write_obj)
+            csv_writer.writerow(final)
 
 
-
+#sample main
 d = output()
 colnames = ["xval","yval"]
 colvalue = [[1,2,3],[20,30,40]]
@@ -47,3 +51,7 @@ for r in range(2):
 
 print(d_1)
 d.draw_plot(colnames, plot_sampx,plot_sampy)
+for r in range(3):
+    d.save_data('test1.csv',plot_sampy)
+
+
