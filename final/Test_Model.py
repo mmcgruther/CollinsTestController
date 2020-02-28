@@ -113,12 +113,19 @@ class Test_Model(QtCore.QAbstractTableModel):
     def append_new_equipment(self, test, equipment):
         self.data[test][equipment] = {"config": {}, "run": {}, "reset": {}}
 
-    def append_new_command(self, command, commandName, test, equipment, phase):
-        newCommand = {"name": command, "args": []}
-        if commandName not in self.data[test][equipment][phase].keys():
-            self.data[test][equipment][phase][commandName] = newCommand
+    def append_new_command(self, test, equipment, phase, cmdName, command, args = []):
+        newCommand = {"name": command, "args": args}
+        if cmdName not in self.data[test][equipment][phase].keys():
+            self.data[test][equipment][phase][cmdName] = newCommand
             self.insertRows(self.parent, 0, 1)
             self.dataChanged.emit(QtCore.QModelIndex(), QtCore.QModelIndex())
+
+    def set_command(self, test, equipment, phase, cmdName, command, args):
+        if cmdName in self.data[test][equipment][phase].keys():
+            self.data[test][equipment][phase][cmdName]['args'] = args
+        else:
+            self.append_new_command(test, equipment, phase, cmdName, command, args)
+
 
     def setData(self, data):
         self.data = data
@@ -181,10 +188,11 @@ class Test_Model(QtCore.QAbstractTableModel):
                 command = list(self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase])[index.row()]
                 numArgs = self.get_num_args(self.selectedTest,self.selectedEquipment,self.selectedPhase,command)
                 if numArgs > (index.column() - 1):
-                    self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase][command]['args'][0] = value
+                    self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase][command]['args'][index.column() - 1] = value
                     return True
                 else:
-                    return False
+                    self.data[self.selectedTest][self.selectedEquipment][self.selectedPhase][command]['args'].append(value)
+                    return True
         return False
 
     def flags(self, index):

@@ -5,20 +5,26 @@ class Visa_Session:
         self.addr = addr
         self.rm = visa.ResourceManager(backend)
         
-    def connect(self):
+    def connect(self, w_term, r_term):
         failure = False
         try:
-            self.device = self.rm.open_resource(self.addr, write_termination='\n', read_termination='\n')
+            self.device = self.rm.open_resource(self.addr, write_termination=w_term, read_termination=r_term)
         except:
             failure = True
         return failure
+
+    def close(self):
+        try:
+            self.device.close()
+        except:
+            pass
 
     def query(self, cmd, *args):
         response = None
         try:
             response = self.device.query(cmd)
-        except:
-            pass
+        except Exception as e:
+            print(e)
         return response
 
     def write(self, cmd, *args):

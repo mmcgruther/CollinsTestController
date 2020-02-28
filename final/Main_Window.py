@@ -1,10 +1,11 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog, QVBoxLayout
 from final import Controller_Model, Equipment_Window
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import sys, time, json
+import pandas as pd
 
 class Main_Window(QMainWindow):
     def __init__(self, equipment_file = "equipment.json", tests_file = "tests.json", backend = "@py"):
@@ -59,15 +60,19 @@ class Main_Window(QMainWindow):
         self.phase_combobox = self.findChild(QComboBox, 'phase_combobox')
         self.phase_combobox.currentIndexChanged.connect(self.controller_model.slot_change_selected_phase)
 
-        self.graphics_view = self.findChild(QGraphicsView, 'graphics_view')
-        self.figure = plt.figure()        
+        self.vboxlayout = self.findChild(QVBoxLayout, 'verticalLayout_3')
+        #self.graphics_view = self.findChild(QGraphicsView, 'graphics_view')
+        self.figure = plt.figure(facecolor='black')        
+        self.figure.set_facecolor("none")
         self.canvas = FigureCanvas(self.figure)
-        self.scene = QGraphicsScene(self.graphics_view)
+        self.vboxlayout.addWidget(self.canvas)
+        """self.scene = QGraphicsScene(self.graphics_view)
         self.scene.addWidget(self.canvas)
         self.graphics_view.setScene(self.scene)
+        self.scene.setBackgroundBrush(QtCore.Qt.green)"""
         self.canvas.draw()
-        self.show()
-        self.controller_model.signal_update_canvas.connect(self.slot_update_canvas)
+        
+        self.controller_model.output_manager.signal_update_canvas.connect(self.slot_update_canvas)
 
         self.pin_button = self.findChild(QPushButton, 'pin_button')
         self.pin_button.clicked.connect(self.slot_open_pin_dialog)
@@ -80,6 +85,11 @@ class Main_Window(QMainWindow):
 
         self.action_new_command = self.findChild(QAction, 'action_new_command')
         self.action_new_command.triggered.connect(self.slot_add_new_command)
+
+        self.action_exit = self.findChild(QAction, 'action_exit')
+        self.action_exit.triggered.connect(self.close)
+
+        self.showMaximized()
 
     @QtCore.pyqtSlot()
     def slot_add_new_command(self):
@@ -113,10 +123,7 @@ class Main_Window(QMainWindow):
             #Add test/check valid name
             self.controller_model.add_new_test(name)
 
-    def slot_update_canvas(self, data):
-        self.data = data
-        plt.clf()
-        plt.plot(self.data)
+    def slot_update_canvas(self, fig):
         self.canvas.draw()
 
     @QtCore.pyqtSlot(bool)
@@ -169,6 +176,7 @@ class Main_Window(QMainWindow):
     @QtCore.pyqtSlot()
     def slot_open_equipment_gui(self):
         self.dialog = Equipment_Window.Equipment_Window("string")
+        self.dialog.signal_set_gui_commands.connect(self.controller_model.slot_set_test_commands)
         self.dialog.show()
         
 

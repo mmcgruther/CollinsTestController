@@ -41,6 +41,9 @@
      <property name="text">
       <string>Center Frequency</string>
      </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
     </widget>
     <widget class="QRadioButton" name="radioButton_2">
      <property name="geometry">
@@ -53,6 +56,9 @@
      </property>
      <property name="text">
       <string>Span</string>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBox">
@@ -93,6 +99,9 @@
      <property name="text">
       <string>Start Frequency</string>
      </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit">
      <property name="geometry">
@@ -115,6 +124,9 @@
      </property>
      <property name="text">
       <string>Stop Frequency</string>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_2">
@@ -152,6 +164,9 @@
      <property name="text">
       <string>Resolution Bandwidth</string>
      </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
     </widget>
     <widget class="QRadioButton" name="radioButton_6">
      <property name="geometry">
@@ -164,6 +179,9 @@
      </property>
      <property name="text">
       <string>Video Bandwidth</string>
+     </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
@@ -211,6 +229,9 @@
      <property name="text">
       <string>Reference Level</string>
      </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
     </widget>
     <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
      <property name="geometry">
@@ -247,6 +268,9 @@
      <property name="text">
       <string>Input Attenuation</string>
      </property>
+     <property name="autoExclusive">
+      <bool>false</bool>
+     </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_3">
      <property name="geometry">
@@ -279,7 +303,7 @@
      <x>0</x>
      <y>0</y>
      <width>349</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
