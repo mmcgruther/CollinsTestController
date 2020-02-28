@@ -45,8 +45,8 @@ class Visa_Worker(QtCore.QObject):
             
     @QtCore.pyqtSlot()
     def slot_disconnect(self):
-        print(threading.get_ident(), "Disconnecting from", self.addr)
         if self.connected:
+            print(threading.get_ident(), "Disconnecting from", self.addr)
             self.connected = False
             self.session.close()
 
@@ -95,4 +95,7 @@ class Visa_Worker(QtCore.QObject):
                 print(threading.get_ident(), "Query failure", self.addr)
             else:
                 self.signal_query_success.emit(self.addr, response, qID)
+
+    def __del__(self):
+        self.slot_disconnect()
             

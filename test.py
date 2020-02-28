@@ -20,9 +20,19 @@ class Controller_Test(unittest.TestCase):
 
     def test_execution(self):
         QTest.mouseClick(self.main_window.refresh_button, Qt.LeftButton)
-        QTest.qWait(1000)
+        QTest.qWait(100)
         QTest.mouseClick(self.main_window.execute_button, Qt.LeftButton)
-        QTest.qWait(12000)
+        QTest.qWait(22000)
+        self.assertEqual(len(self.main_window.controller_model.output_manager.df.index), 10)
+
+    def test_abort(self):
+        QTest.mouseClick(self.main_window.refresh_button, Qt.LeftButton)
+        QTest.qWait(100)
+        QTest.mouseClick(self.main_window.execute_button, Qt.LeftButton)
+        QTest.qWait(3000)
+        QTest.mouseClick(self.main_window.abort_button, Qt.LeftButton)
+        QTest.qWait(1000)
+        self.assertEqual(len(self.main_window.controller_model.output_manager.df.index), 2)
 
 if __name__ == "__main__":
     unittest.main()

@@ -3,10 +3,9 @@ from final import Equipment_Model, Test_Model, Visa_Worker, IP_Table_Model
 from final.connection_manager import Connection_Manager
 from final.worker_pool import Worker_Pool
 from final.test_manager import Test_Manager
+from final.output_manager import Output_Manager
 import json, threading
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
+
 
 """
 TODO:
@@ -27,6 +26,7 @@ class Controller_Model(QtCore.QObject):
         self.test_model = Test_Model.Test_Model(self, tests_file)
         self.worker_pool = Worker_Pool(self, backend)
         self.connection_manager = Connection_Manager(self, self.equipment_model, self.worker_pool)
+        self.output_manager = Output_Manager(self)
         self.test_manager = None
         self.selectedTest = None
         self.selectedEquipment = None
@@ -42,7 +42,6 @@ class Controller_Model(QtCore.QObject):
     signal_set_test_combobox = QtCore.pyqtSignal(bool)
     signal_set_equipment_combobox = QtCore.pyqtSignal(bool)
     signal_set_phase_combobox = QtCore.pyqtSignal(bool)
-    signal_update_canvas = QtCore.pyqtSignal(object)
 
     signal_set_test_list = QtCore.pyqtSignal(list)
     signal_set_equipment_list = QtCore.pyqtSignal(list)
@@ -117,7 +116,7 @@ class Controller_Model(QtCore.QObject):
         except Exception as  e:
             print(e)
         else:
-            self.init_output()
+            self.output_manager.init_output()
             self.signal_set_refresh_button.emit(False)
             self.signal_set_execute_button.emit(False)
             self.signal_set_abort_button.emit(True)
@@ -127,45 +126,7 @@ class Controller_Model(QtCore.QObject):
     @QtCore.pyqtSlot()
     def abort_test(self):
         self.signal_set_abort_button.emit(False)
-        print("Main thread aborting test", threading.get_ident())
-        for equipment in self.test_model.get_test_equipment_list(self.selectedTest):
-            self.worker_pool.get_worker(self.test_equipment_addr[equipment]).signal_stop.emit()
-
-    def init_output(self):
-        self.plot_data = []
-        self.df = pd.DataFrame(columns=["Peak Frequency", "Peak Amplitude"])
-        self.figure = plt.gcf()
-        self.subplot1 = self.figure.add_subplot(211)
-        self.subplot2 = self.figure.add_subplot(212)
-
-    def update_output(self, str_data, addr, qID):
-        """
-        TODO: 
-        -Create Output Manager to format data output per test
-        """
-
-        if qID == 0:
-            self.subplot1.cla()
-            data_split = str_data.split(',')
-            data_array = np.array(list(map(float, data_split[1:])))
-            self.subplot1.plot(data_array)
-            self.plot_data.append(data_array)
-
-        if qID == 1:
-            self.subplot2.cla()
-            data_split = str_data.split(',')
-            data_array = np.array(list(map(float, data_split)))
-            table = pd.DataFrame({"Peak Frequency": [data_array[0]], "Peak Amplitude": [data_array[1]]})
-            self.df = self.df.append(table, ignore_index=True)
-
-            #print(self.df)
-            cell_text = []
-            for row in range(len(self.df)):
-                cell_text.append(self.df.iloc[row])
-            self.subplot2.table(cellText=cell_text, colLabels=self.df.columns, loc='center')
-            self.subplot2.axis('off')
-
-        self.signal_update_canvas.emit(self.figure)
+        self.test_manager.abort_test()
 
     @QtCore.pyqtSlot(str)
     def slot_write_success(self, addr):
@@ -175,7 +136,7 @@ class Controller_Model(QtCore.QObject):
     def slot_query_success(self, addr, data, qID):
         print("Data received from", addr, "type:", type(data), "cmd ID:", qID)
         if len(data) != 0:
-            self.update_output(data, addr, qID)
+            self.output_manager.update_output(data, addr, qID)
         self.test_manager.next_command_by_addr(addr)
 
     @QtCore.pyqtSlot(str, str)

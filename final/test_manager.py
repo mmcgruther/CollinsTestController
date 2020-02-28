@@ -114,6 +114,11 @@ class Test_Manager(QtCore.QObject):
                 print("End of test")
                 self.parent.end_test()
 
+    def abort_test(self):
+        print("Main thread aborting test", threading.get_ident())
+        for equipment in self.test_model.get_test_equipment_list(self.selectedTest):
+            self.worker_pool.get_worker(self.test_equipment_addr[equipment]).signal_stop.emit()
+
     def timer_callback(self):
         if self.executionPhase == 'config':
             self.executionPhase = 'run'

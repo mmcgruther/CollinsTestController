@@ -72,7 +72,7 @@ class Main_Window(QMainWindow):
         self.scene.setBackgroundBrush(QtCore.Qt.green)"""
         self.canvas.draw()
         
-        self.controller_model.signal_update_canvas.connect(self.slot_update_canvas)
+        self.controller_model.output_manager.signal_update_canvas.connect(self.slot_update_canvas)
 
         self.pin_button = self.findChild(QPushButton, 'pin_button')
         self.pin_button.clicked.connect(self.slot_open_pin_dialog)
