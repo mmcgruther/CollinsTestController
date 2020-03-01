@@ -1,48 +1,55 @@
-#import pyvisa
+
 from PyQt5 import QtCore
 import sys, time, threading
 from final.Visa_Wrapper import Visa_Session
 
 class Visa_Worker(QtCore.QObject):
-    def __init__(self, addr = None, *args, **kwargs):
+    def __init__(self, addr, backend, *args, **kwargs):
         super(Visa_Worker, self).__init__()
-        self.session = Visa_Session(addr)
+        self.session = Visa_Session(addr, backend)
         self.addr = addr
         self.args = args
         self.kwargs = kwargs
         self.connected = False
         self.running = False
 
-    signal_connect = QtCore.pyqtSignal(str)
+    signal_connect = QtCore.pyqtSignal(str, str, str)
     signal_write = QtCore.pyqtSignal(str)
+    signal_query = QtCore.pyqtSignal(str, int)
     signal_connected = QtCore.pyqtSignal(str, str)
     signal_not_connected = QtCore.pyqtSignal(str)
     signal_start = QtCore.pyqtSignal()
+    signal_stop = QtCore.pyqtSignal()
     signal_write_success = QtCore.pyqtSignal(str)
-    signal_query_success = QtCore.pyqtSignal()
-    signal_error = QtCore.pyqtSignal()
+    signal_query_success = QtCore.pyqtSignal(str, str, int)
+    signal_error = QtCore.pyqtSignal(str, str)
+    signal_disconnect = QtCore.pyqtSignal()
 
-    @QtCore.pyqtSlot(str)
-    def slot_connect(self, cmd):
+    @QtCore.pyqtSlot(str, str, str)
+    def slot_connect(self, cmd, w_term, r_term):
         print(threading.get_ident(), "Connecting to", self.addr)
-
-        if self.addr == "TCPIP0::192.168.1.3":
-            time.sleep(1)
+            
+        if self.session.connect(w_term, r_term):
+            print(threading.get_ident(), "Connection failure", self.addr)
             self.connected = False
             self.signal_not_connected.emit(self.addr)
-        else:
-            time.sleep(0.5)
-            self.connected = True
-            self.signal_connected.emit(self.addr, "dummy")
-            """
-            
-            self.session.connect()
+        else:    
             response = self.session.query(cmd)
             if response is not None:
+                self.connected = True
                 self.signal_connected.emit(self.addr, response)
             else:
+                print(threading.get_ident(), "No response", self.addr)
+                self.connected = False
                 self.signal_not_connected.emit(self.addr)
-            """
+            
+    @QtCore.pyqtSlot()
+    def slot_disconnect(self):
+        if self.connected:
+            print(threading.get_ident(), "Disconnecting from", self.addr)
+            self.connected = False
+            self.session.close()
+
     @QtCore.pyqtSlot()
     def slot_start(self):
         self.running = True
@@ -56,31 +63,39 @@ class Visa_Worker(QtCore.QObject):
     @QtCore.pyqtSlot(str)
     def slot_write(self, cmd):
         if self.addr is None:
-            self.signal_error.emit()
+            self.signal_error.emit(self.addr, cmd)
         elif not self.connected:
-            self.signal_error.emit()
+            print(threading.get_ident(), "Write attempt while not connected", self.addr)
+            self.signal_error.emit(self.addr, cmd)
         elif not self.running:
             print(threading.get_ident(), "Skipped write to", self.addr)
+            self.signal_write_success.emit(self.addr)
         else:
             print(threading.get_ident(), "Write to", self.addr, cmd)
-            time.sleep(1)
-            self.signal_write_success.emit(self.addr)
-            """
-            
             if self.session.write(cmd):
-                print("Write failure:", addr)
+                self.signal_error.emit(self.addr, cmd)
+                print(threading.get_ident(), "Write failure", addr)
             else:
                 self.signal_write_success.emit(self.addr)
-            """
-    @QtCore.pyqtSlot()
-    def slot_query(self):
+
+    @QtCore.pyqtSlot(str, int)
+    def slot_query(self, cmd, qID):
         if self.addr is None:
-            self.signal_error.emit()
+            self.signal_error.emit(self.addr, cmd)
         elif not self.connected:
-            self.signal_error.emit()
+            self.signal_error.emit(self.addr, cmd)
         elif not self.running:
             print(threading.get_ident(), "Skipped query to", self.addr)
+            self.signal_query_success.emit(self.addr, None, qID)
         else:
-            print(threading.get_ident(), "Query to", self.addr)
-            self.signal_write_success.emit()
+            print(threading.get_ident(), "Query to", self.addr, cmd)
+            response = self.session.query(cmd)
+            if response is None:
+                self.signal_error.emit(self.addr, cmd)
+                print(threading.get_ident(), "Query failure", self.addr)
+            else:
+                self.signal_query_success.emit(self.addr, response, qID)
+
+    def __del__(self):
+        self.slot_disconnect()
             

@@ -1,0 +1,225 @@
+{
+  "Function Generator": {
+    "address": "TCPIP0::192.168.1.21::INSTR",
+    "idn": "Rigol Technologies,DG4162,DG4C151300243,00.01.04",
+    "timeout": 1000,
+    "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
+    "set_output": {
+      "cmd": ":OUTPUT {0}",
+      "type": "w",
+      "default_args": [
+        "OFF"
+      ]
+    },
+    "set_volts": {
+      "cmd": ":VOLT {0}",
+      "type": "w",
+      "default_args": [
+        "3"
+      ]
+    },
+    "set_volt_offset": {
+      "cmd": ":VOLT:OFFSet {0}",
+      "type": "w",
+      "default_args": [
+        "0"
+      ]
+    },
+    "set_frequency": {
+      "cmd": ":FREQ {0}",
+      "type": "w",
+      "default_args": [
+        "1000"
+      ]
+    },
+    "set_phase": {
+      "cmd": ":PHASe {0}",
+      "type": "w",
+      "default_args": [
+        "0"
+      ]
+    },
+    "reset_device": {
+      "cmd": "*CLS",
+      "type": "w",
+      "default_args": []
+    }
+  },
+  "Oscilloscope": {
+    "address": "TCPIP0::192.168.1.20::INSTR",
+    "idn": "TEKTRONIX,DPO3034,C013408,CF:91.1CT FV:v2.23 ",
+    "timeout": 1000,
+    "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
+    "data_init": {
+      "type": "w",
+      "cmd": "Data {0}",
+      "default_args": [
+        "INIT"
+      ]
+    },
+    "data_sou": {
+      "type": "w",
+      "cmd": "DATA:SOU {0}",
+      "default_args": [
+        "CH1"
+      ]
+    },
+    "data_start": {
+      "type": "w",
+      "cmd": "DATA:START {0}",
+      "default_args": [
+        "1"
+      ]
+    },
+    "data_stop": {
+      "type": "w",
+      "cmd": "DATA:STOP {0}",
+      "default_args": [
+        "4000"
+      ]
+    },
+    "data_width": {
+      "type": "w",
+      "cmd": "DATA:WIDTH {0}",
+      "default_args": [
+        "1"
+      ]
+    },
+    "data_enc": {
+      "type": "w",
+      "cmd": "DATA:ENC {0}",
+      "default_args": [
+        "ASCII"
+      ]
+    },
+    "get_curve": {
+      "type": "q",
+      "cmd": "CURVE?",
+      "default_args": []
+    },
+    "cls": {
+      "type": "w",
+      "cmd": "*CLS",
+      "args": []
+    }
+  },
+  "Rigol Spectrum Analyzer": {
+    "address": "TCPIP0::192.168.1.30::INSTR",
+    "idn": "Rigol Technologies,DSA1030A,DSA1A143200146,00.01.14.00.00",
+    "timeout": 1000,
+    "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
+    "set_center_freq": {
+      "cmd": ":SENS:FREQ:CENT {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
+    },
+    "set_span_freq": {
+      "cmd": ":SENS:FREQ:SPAN {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
+    },
+    "set_start_freq": {
+      "cmd": ":SENS:FREQ:STARt {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
+    },
+    "set_stop_freq": {
+      "cmd": ":SENS:FREQ:STOP {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
+    },
+    "set_resolution_bandwidth": {
+      "cmd": ":SENS:BAND:RES {0}",
+      "type": "w",
+      "default_args": [
+        "1MHZ"
+      ]
+    },
+    "set_peak_table_state": {
+    	"cmd": ":TRACe:MATH:PEAK:TABLe:STATe {0}",
+	"type": "w",
+	"default_args": [
+		"OFF"
+	]
+    },
+    "set_peak_sort": {
+    	"cmd": ":TRACe:MATH:PEAK:SORT {0}",
+	"type": "w",
+	"default_args": [
+		"FREQ"
+	]
+    },
+    "get_trace": {
+	    "cmd": ":TRACe? TRACE1",
+	    "type": "q",
+	    "default_args": []
+    },
+    "get_peak": {
+      "cmd": ":TRACe:MATH:PEAK?",
+      "type": "q",
+      "default_args": []
+    }
+  },
+  "Agilent Signal Generator": {
+    "address": "TCPIP0::192.168.1.40::INSTR",
+    "idn": "Agilent Technologies, N5181B, MY53050099, B.01.51",
+    "timeout": 1000,
+    "idn_cmd": "*IDN?",
+    "write_termination": "\n",
+    "read_termination": "\n",
+    "set_list_pow": {
+      "cmd": ":LIST:POW {0}",
+      "type": "w",
+      "default_args": "-30"
+    },
+    "set_list_freq": {
+      "cmd": ":LIST:FREQ {0}",
+      "type": "w",
+      "default_args": "1GHz"
+    },
+    "set_list_dwell": {
+      "cmd": ":LIST:DWEL1 {0}",
+      "type": "w",
+      "default_args": "1"
+    },
+    "set_list_retrace": {
+      "cmd": ":LIST:RETRace {0}",
+      "type": "w",
+      "default_args": "ON"
+    },
+    "set_list_type": {
+      "cmd": ":LIST:TYPE {0}",
+      "type": "w",
+      "default_args": "LIST"
+    },
+    "set_output": {
+      "cmd": ":OUTPut {0}",
+      "type": "w",
+      "default_args": "OFF"
+    },
+    "set_pow_mode": {
+      "cmd": ":POWer:MODE {0}",
+      "type": "w",
+      "default_args": "LIST"
+    },
+    "set_freq_mode": {
+      "cmd": ":FREQ:MODE {0}",
+      "type": "w",
+      "default_args": "LIST"
+    }
+  }
+}

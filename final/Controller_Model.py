@@ -1,204 +1,207 @@
 from PyQt5 import QtCore, QtGui
 from final import Equipment_Model, Test_Model, Visa_Worker, IP_Table_Model
+from final.connection_manager import Connection_Manager
+from final.worker_pool import Worker_Pool
+from final.test_manager import Test_Manager
+from final.output_manager import Output_Manager
 import json, threading
+
+
+"""
+TODO:
+    -Create Output Manager to format data output per test
+    -Get csv file data for output manager
+    -Create tabbed window for Test config
+
+    -Documentation
+    -Refactor Connections out of Equipment_Model
+    -Rename Controller Model?
+"""
 
 class Controller_Model(QtCore.QObject):
    
-    def __init__(self, parent, equipment_file=None, test_file=None):
+    def __init__(self, parent, equipment_file, tests_file, backend):
         super(Controller_Model, self).__init__()
-        self.equipment_model = Equipment_Model.Equipment_Model("equipment1.json")
-        self.test_model = Test_Model.Test_Model(self)
-        self.ip_table_model = IP_Table_Model.IP_Table_Model(self, self.get_IP_table_data())
-        self.workersInit = False
+        self.equipment_model = Equipment_Model.Equipment_Model(equipment_file)
+        self.test_model = Test_Model.Test_Model(self, tests_file)
+        self.worker_pool = Worker_Pool(self, backend)
+        self.connection_manager = Connection_Manager(self, self.equipment_model, self.worker_pool)
+        self.output_manager = Output_Manager(self)
+        self.test_manager = None
+        self.selectedTest = None
+        self.selectedEquipment = None
+        self.selectedPhase = None
+        self.default_test_selection()
+        self.ip_table_model = IP_Table_Model.IP_Table_Model(self, self.equipment_model.get_IP_table_data())
+        self.phase_list = ['config','run','reset']
+
 
     signal_set_refresh_button = QtCore.pyqtSignal(bool)
     signal_set_execute_button = QtCore.pyqtSignal(bool)
     signal_set_abort_button = QtCore.pyqtSignal(bool)
     signal_set_test_combobox = QtCore.pyqtSignal(bool)
     signal_set_equipment_combobox = QtCore.pyqtSignal(bool)
+    signal_set_phase_combobox = QtCore.pyqtSignal(bool)
 
+    signal_set_test_list = QtCore.pyqtSignal(list)
     signal_set_equipment_list = QtCore.pyqtSignal(list)
+    signal_set_phase_list = QtCore.pyqtSignal(list)
+
+    signal_set_test_index = QtCore.pyqtSignal(int)
+    signal_set_equipment_index = QtCore.pyqtSignal(int)
+
+    def initialize_view(self):
+        self.signal_set_test_list.emit(self.test_model.get_test_list())
+        self.slot_change_selected_test(0)
+
+    def add_new_command(self, command, commandName):
+        self.test_model.append_new_command(self.selectedTest, self.selectedEquipment, self.selectedPhase, commandName, command)
+
+
+    def get_configured_equipment_command_list(self):
+        return self.equipment_model.get_equipment_command_list(self.selectedEquipment)
+
+    def add_new_equipment(self, equipment):
+        if not self.test_model.is_equipment(self.selectedTest, equipment):
+            self.test_model.append_new_equipment(self.selectedTest, equipment)
+            equipment_list = self.test_model.get_test_equipment_list(self.selectedTest)
+            self.signal_set_equipment_list.emit(equipment_list)
+            self.signal_set_equipment_index.emit(len(equipment_list) - 1)
+
+    def get_configured_equipment_list(self):
+        return self.equipment_model.get_configured_equipment_list()
+
+    def add_new_test(self, testName):
+        if not self.test_model.is_test(testName):
+            self.test_model.append_new_test(testName)
+            #Select new test
+            test_list = self.test_model.get_test_list()
+            self.signal_set_test_list.emit(test_list)
+            self.signal_set_test_index.emit(len(test_list) - 1)
+
+    def default_test_selection(self):
+        test_list = self.test_model.get_test_list()
+        if len(test_list) == 0:
+            self.selectedTest = None
+        else:
+            self.selectedTest = test_list[0]
+        self.default_equipment_selection(self.selectedTest)
+
+    def default_equipment_selection(self, test):
+        equipment_list = self.test_model.get_test_equipment_list(test)
+        if len(equipment_list) == 0:
+            self.selectedEquipment = None
+        else:
+            self.selectedEquipment = equipment_list[0]
+        self.default_phase_selection(test, self.selectedEquipment)
+
+    def default_phase_selection(self, test, equipment):
+        self.selectedPhase = 'config'
 
     @QtCore.pyqtSlot()
     def list_resources(self):
-        """On first call, starts workers for each address.
-        Begin queries for each worker to identify connected equipment.
-        Disables refresh button until queries completed"""
         self.signal_set_refresh_button.emit(False)
         self.signal_set_execute_button.emit(False)
-        self.workersResponded = 0
         print("Main thread", threading.get_ident())
-
-        for addr in self.get_addr_list():
-            self.reset_equipment_index(addr)
-            self.set_connected(addr, 2)
-            
-            if not self.workersInit:           
-                self.set_worker(self.create_worker(addr), addr)
-
-            self.next_connection(addr)
- 
-        self.workersInit = True
-        self.ip_table_model.setData(self.get_IP_table_data())
-
-    @QtCore.pyqtSlot(int)
-    def slot_change_selected_test(self, index):
-        self.test_model.slot_selected_test_changed(index)
-        self.signal_set_equipment_list.emit(self.get_test_equipment())
+        self.connection_manager.list_resources()
+        self.ip_table_model.setData(self.equipment_model.get_IP_table_data())
+        
 
     @QtCore.pyqtSlot()
     def slot_execute_test(self):
         """Starts sending test commands to workers"""
-        self.test_equipment_addr = {}
-        for equipment in self.get_test_equipment():
-            addr = self.get_equipment_address(equipment)
-            self.test_equipment_addr[equipment] = addr
-            if addr is None:
-                #Error: equipment not connected
-                print(equipment,"not connected")
-                return
-        self.signal_set_refresh_button.emit(False)
-        self.signal_set_execute_button.emit(False)
-        self.signal_set_abort_button.emit(False)
-        self.signal_set_test_combobox.emit(False)
-        self.signal_set_equipment_combobox.emit(False)
-
-        self.workersResponded = 0
-        print("Main thread starting test", threading.get_ident())
-
-        for equipment in self.get_test_equipment():
-            self.reset_test_index(equipment)
-            self.get_worker(self.test_equipment_addr[equipment]).signal_start.emit()
-            self.next_command(equipment)
+        self.test_manager = Test_Manager(self, self.test_model, self.equipment_model, self.worker_pool, self.selectedTest)
+        try:
+            self.test_manager.execute_test()
+        except Exception as  e:
+            print(e)
+        else:
+            self.output_manager.init_output()
+            self.signal_set_refresh_button.emit(False)
+            self.signal_set_execute_button.emit(False)
+            self.signal_set_abort_button.emit(True)
+            self.signal_set_test_combobox.emit(False)
+            self.signal_set_equipment_combobox.emit(False)
 
     @QtCore.pyqtSlot()
     def abort_test(self):
-        pass    
-       
-    @QtCore.pyqtSlot(str, str)
-    def slot_connected(self, addr, name):
-        if name == self.get_equipment_idn(addr):
-            print(addr, ": Connected to ", name)
-            self.set_connected(addr, 1)
-            self.connection_response()
-        elif self.next_connection(addr):
-            self.connection_response()
-        else:
-            print(addr, ": Incorrect ID", name, ", Reconnecting...")
-        
-    @QtCore.pyqtSlot(str)
-    def slot_not_connected(self, addr):
-        if self.next_connection(addr):
-            self.connection_response()
-        else:
-            print(addr, ": No connection response. Reconnecting...")
+        self.signal_set_abort_button.emit(False)
+        self.test_manager.abort_test()
 
     @QtCore.pyqtSlot(str)
     def slot_write_success(self, addr):
-        equipment = list(self.test_equipment_addr.keys())[list(self.test_equipment_addr.values()).index(addr)]
-        self.next_command(equipment)
+        self.test_manager.next_command_by_addr(addr)
 
-    def next_connection(self, addr):
-        self.set_connected(addr, 2)
-        if not self.increment_equipment(addr):
-            self.get_worker(addr).signal_connect.emit(addr)
-            return False
-        else:
-            print(addr, ": No connection found")
-            self.set_connected(addr, 0)
-            return True
+    @QtCore.pyqtSlot(str, str, int)
+    def slot_query_success(self, addr, data, qID):
+        print("Data received from", addr, "type:", type(data), "cmd ID:", qID)
+        if len(data) != 0:
+            self.output_manager.update_output(data, addr, qID)
+        self.test_manager.next_command_by_addr(addr)
 
-    def next_command(self, equipment):
-        cmd = self.get_next_config_command(equipment)
-        if cmd is None:
-            #Current phase complete, wait for other equipment
-            self.test_response()
-        else:
-            addr = self.test_equipment_addr[equipment]
-            self.get_worker(addr).signal_write.emit(cmd)
+    @QtCore.pyqtSlot(str, str)
+    def slot_error(self, addr, cmd):
+        print("Error from:", addr, "with command:", cmd)
+        self.abort_test()
+        self.test_manager.next_command_by_addr(addr)
 
-    def create_worker(self, addr):
-        w = Visa_Worker.Visa_Worker(addr)
-        w.w_thread = QtCore.QThread()
-        w.w_thread.start()
-
-        w.signal_connect.connect(w.slot_connect)
-        w.signal_write.connect(w.slot_write)
-        w.signal_write_success.connect(self.slot_write_success)
-        w.signal_connected.connect(self.slot_connected)
-        w.signal_not_connected.connect(self.slot_not_connected)
-        w.signal_start.connect(w.slot_start)
-
-        w.moveToThread(w.w_thread)
-        return w
-
-    def connection_response(self):
-        self.ip_table_model.setData(self.get_IP_table_data())
-        self.workersResponded += 1
-        if self.workersResponded == len(self.get_addr_list()):
+    def connection_responded(self, complete = False):
+        self.ip_table_model.setData(self.equipment_model.get_IP_table_data())
+        if complete:
             self.signal_set_refresh_button.emit(True)
             self.signal_set_execute_button.emit(True)
 
-    def test_response(self):
-        """Tracks when worker threads have completed test phase"""
-        self.workersResponded += 1
-        if self.workersResponded == len(self.test_equipment_addr):
-            print("End of test execution")
+    def end_test(self):
+        self.signal_set_refresh_button.emit(True)
+        self.signal_set_execute_button.emit(True)
+        self.signal_set_abort_button.emit(False)
+        self.signal_set_test_combobox.emit(True)
+        self.signal_set_equipment_combobox.emit(True)
+    
+    def set_pin_filename(self, filename):
+        self.pin_filename = filename
 
-            self.signal_set_refresh_button.emit(True)
-            self.signal_set_execute_button.emit(True)
-            self.signal_set_abort_button.emit(False)
-            self.signal_set_test_combobox.emit(True)
-            self.signal_set_equipment_combobox.emit(True)
-
-
-
-    def get_IP_table_data(self):
-        return self.equipment_model.get_IP_table_data()
+    def get_IP_table_model(self):
+        return self.ip_table_model
 
     def get_test_model(self):
         return self.test_model
 
-    def get_tests(self):
-        return self.test_model.get_tests()
+    def get_test_list(self):
+        return self.test_model.get_test_list()
 
     @QtCore.pyqtSlot(int)
-    def slot_selected_test_changed(self, index):
-        self.test_model.slot_selected_test_changed(index)
+    def slot_change_selected_test(self, index):
+        self.selectedTest = self.test_model.get_test_list()[index]
+        self.default_equipment_selection(self.selectedTest)
+        self.test_model.set_view_selections(self.selectedTest, self.selectedEquipment, self.selectedPhase)
+        self.signal_set_equipment_list.emit(self.test_model.get_test_equipment_list(self.selectedTest))
+        self.signal_set_phase_list.emit(self.phase_list)
 
     @QtCore.pyqtSlot(int)
-    def slot_selected_equipment_changed(self, index):
-        self.test_model.slot_selected_equipment_changed(index)
+    def slot_change_selected_equipment(self, index):
+        equipment_list = self.test_model.get_test_equipment_list(self.selectedTest)
+        self.default_equipment_selection(self.selectedTest)
+        if len(equipment_list) > index and index >= 0:
+            self.selectedEquipment = equipment_list[index]
+        self.test_model.set_view_selections(self.selectedTest,self.selectedEquipment, self.selectedPhase)
+        self.signal_set_phase_list.emit(self.phase_list)
 
-    def get_test_equipment(self):
-        return self.test_model.get_test_equipment()
+    @QtCore.pyqtSlot(int)
+    def slot_change_selected_phase(self, index):
+        self.default_phase_selection(self.selectedTest, self.selectedEquipment)
+        if len(self.phase_list) > index and index >= 0:
+            self.selectedPhase = self.phase_list[index]
+        self.test_model.set_view_selections(self.selectedTest,self.selectedEquipment, self.selectedPhase)
 
     def get_equipment_address(self, equipment_name):
         return self.equipment_model.get_equipment_address(equipment_name)
 
-    def reset_test_index(self, equipment):
-        self.test_model.reset_index(equipment)
-
-    def get_worker(self, addr):
-        return self.equipment_model.get_worker(addr)
-
     def get_addr_list(self):
         return self.equipment_model.get_addr_list()
-    
-    def reset_equipment_index(self, addr):
-        self.equipment_model.reset_index(addr)
 
-    def set_connected(self, addr, value):
-        self.equipment_model.set_connected(addr, value)
-
-    def set_worker(self, worker, addr):
-        self.equipment_model.set_worker(worker, addr)
-
-    def get_equipment_idn(self, addr):
-        return self.equipment_model.get_equipment_idn(addr)
-
-    def increment_equipment(self, addr):
-        return self.equipment_model.increment_equipment(addr)
-
-    def get_next_config_command(self, equipment):
-        return self.test_model.get_next_config_command(equipment)
+    @QtCore.pyqtSlot(list)
+    def slot_set_test_commands(self, cmdTupleList):
+        #list of tuples: (phase, cmdName, cmd, args)
+        for phase, cmdName, cmd, args in cmdTupleList:
+            self.test_model.set_command(self.selectedTest, self.selectedEquipment, self.selectedPhase, cmdName, cmd, args)

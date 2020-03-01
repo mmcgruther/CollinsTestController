@@ -1,0 +1,112 @@
+{
+    "test1": {
+        "equipment1": {
+            "config": {
+                "Data Source":
+                {
+                    "name": "data_source",
+                    "args": [
+                        "CH1"
+                    ]
+                },
+                "Data Start":
+                {
+                    "name": "data_start",
+                    "args": [
+                        "1"
+                    ]
+                },
+                "Data Stop":
+                {
+                    "name": "data_start",
+                    "args": [
+                        "4000"
+                    ]
+                },
+                "Data Width":
+                {
+                    "name": "data_width",
+                    "args": [
+                        "1"
+                    ]
+                },
+                "Data Encoding":
+                {
+                    "name": "data_encoding",
+                    "args": [
+                        "ASCII"
+                    ]
+                }
+            },
+            "run": {
+                "Get Immediate Amplitude":
+                {
+                    "name": "get_imm_ampl",
+                    "args": []
+                },
+                "Get Frequency":
+                {
+                    "name": "get_freq",
+                    "args": []
+                }
+            },
+            "reset": {
+                "Clear Device":
+                {
+                    "name": "clear_device",
+                    "args": []
+                }
+            }
+        },
+        "equipment2": {
+            "config": {
+                "Data Source":
+                {
+                    "name": "data_source",
+                    "args": [
+                        "CH1"
+                    ]
+                },
+                "Data Start":
+                {
+                    "name": "data_start",
+                    "args": [
+                        "1"
+                    ]
+                },
+                "Data Stop":
+                {
+                    "name": "data_start",
+                    "args": [
+                        "4000"
+                    ]
+                },
+                "Data Width":
+                {
+                    "name": "data_width",
+                    "args": [
+                        "1"
+                    ]
+                },
+                "Data Encoding":
+                {
+                    "name": "data_encoding",
+                    "args": [
+                        "ASCII"
+                    ]
+                }
+            },
+            "run": {
+            },
+            "reset": {
+                "Clear Device":
+                {
+                    "name": "clear_device",
+                    "args": []
+                }
+            }
+        }
+    },
+    "test2": {
+    }
+}
