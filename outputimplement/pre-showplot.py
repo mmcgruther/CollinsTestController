@@ -1,4 +1,5 @@
-import PyQt5
+from PyQt5 import QtCore, uic, QtGui
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit,QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog, QVBoxLayout
 import sys
 import pandas as pd 
 import numpy as np 
@@ -8,11 +9,13 @@ from csv import writer
 #convert string input array into integers for display
 #create the plot in the GUI canvas space and not plot.show
 
-class output:
+class output(QtGui.QWidget):
 
     def __init__(self):
         data = {}
         self.df = pd.DataFrame(data)
+        uic.loadUi('final/Main_Window.ui', self)
+        self.xlabel=QtGui.QLineEdit('xlabel', self)
 
     def draw_table(self, colnames, colval):
         data_1 = {}
