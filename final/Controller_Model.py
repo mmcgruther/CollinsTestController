@@ -34,6 +34,7 @@ class Controller_Model(QtCore.QObject):
         self.default_test_selection()
         self.ip_table_model = IP_Table_Model.IP_Table_Model(self, self.equipment_model.get_IP_table_data())
         self.phase_list = ['config','run','reset']
+        self.parent=parent
 
 
     signal_set_refresh_button = QtCore.pyqtSignal(bool)

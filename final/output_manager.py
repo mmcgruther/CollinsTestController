@@ -3,12 +3,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from PyQt5 import QtCore, QtGui
 from csv import writer 
-
+from PyQt5.QtWidgets import QLineEdit
 class Output_Manager(QtCore.QObject):
     def __init__(self, parent):
         super(Output_Manager, self).__init__()
         self.parent = parent
         self.df = pd.DataFrame({})
+
+        self.xlabel = self.findChild(QLineEdit, 'xlabel')
 
     signal_update_canvas = QtCore.pyqtSignal(object)
 
