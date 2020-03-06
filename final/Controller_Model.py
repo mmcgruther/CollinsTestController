@@ -117,12 +117,22 @@ class Controller_Model(QtCore.QObject):
         except Exception as  e:
             print(e)
         else:
-            self.output_manager.init_output()
+            test_output_params = self.get_test_lineedits()
+            self.output_manager.init_output(test_output_params)
             self.signal_set_refresh_button.emit(False)
             self.signal_set_execute_button.emit(False)
             self.signal_set_abort_button.emit(True)
             self.signal_set_test_combobox.emit(False)
             self.signal_set_equipment_combobox.emit(False)
+
+    def get_test_lineedits(self):
+        line_dict = {}
+        line_dict["xlabel"] = self.parent.xlabel_lineedit.text()
+        line_dict["ylabel"] = self.parent.ylabel_lineedit.text()
+        line_dict["plot_title_in_lineedit"] = self.parent.plot_title_in_lineedit.text()
+        line_dict["cent_freq_in_lineedit"] = self.parent.cent_freq_in_lineedit.text()
+        line_dict["freq_span_in_lineedit"] = self.parent.freq_span_in_lineedit.text()
+        return line_dict
 
     @QtCore.pyqtSlot()
     def abort_test(self):

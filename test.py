@@ -11,6 +11,7 @@ class Controller_Test(unittest.TestCase):
         self.main_window = Main_Window("testfiles/equipment.json", "testfiles/tests.json", "testfiles/simulated_devices.yaml@sim")
 
     def test_connection(self):
+        print("TEST CONNECTION")
         QTest.mouseClick(self.main_window.refresh_button, Qt.LeftButton)
         QTest.qWait(1000)
         
@@ -19,13 +20,17 @@ class Controller_Test(unittest.TestCase):
         self.assertEqual(self.main_window.controller_model.equipment_model.get_connected("TCPIP::192.168.1.3::10001::SOCKET"), 1)
 
     def test_execution(self):
+        print("TEST EXECUTION")
         QTest.mouseClick(self.main_window.refresh_button, Qt.LeftButton)
         QTest.qWait(100)
+        QTest.keyClicks(self.main_window.xlabel_lineedit, "test X label")
         QTest.mouseClick(self.main_window.execute_button, Qt.LeftButton)
         QTest.qWait(22000)
         self.assertEqual(len(self.main_window.controller_model.output_manager.df.index), 10)
+        self.assertEqual(self.main_window.controller_model.output_manager.params["xlabel"], "test X label")
 
     def test_abort(self):
+        print("TEST ABORT")
         QTest.mouseClick(self.main_window.refresh_button, Qt.LeftButton)
         QTest.qWait(100)
         QTest.mouseClick(self.main_window.execute_button, Qt.LeftButton)
@@ -33,6 +38,7 @@ class Controller_Test(unittest.TestCase):
         QTest.mouseClick(self.main_window.abort_button, Qt.LeftButton)
         QTest.qWait(1000)
         self.assertEqual(len(self.main_window.controller_model.output_manager.df.index), 2)
+        self.main_window.close()
 
 if __name__ == "__main__":
     unittest.main()

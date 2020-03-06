@@ -14,7 +14,9 @@ class Output_Manager(QtCore.QObject):
 
     signal_update_canvas = QtCore.pyqtSignal(object)
 
-    def init_output(self):
+    def init_output(self, params):
+        #params is a dictionary of text from GUI line edits. Ie: params["xlabel"]
+        self.params = params
         self.plot_data = []
         self.df = pd.DataFrame(columns=["Peak Frequency", "Peak Amplitude"])
         self.figure = plt.gcf()
@@ -46,11 +48,6 @@ class Output_Manager(QtCore.QObject):
             csv_writer.writerow(final)
 
     def update_output(self, str_data, addr, qID):
-        """
-        TODO: 
-        -Create Output Manager to format data output per test
-        """
-
         if qID == 0:
             self.subplot1.cla()
             data_split = str_data.split(',')

@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog, QVBoxLayout, QLineEdit
 from final import Controller_Model, Equipment_Window
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -88,6 +88,12 @@ class Main_Window(QMainWindow):
 
         self.action_exit = self.findChild(QAction, 'action_exit')
         self.action_exit.triggered.connect(self.close)
+
+        self.xlabel_lineedit = self.findChild(QLineEdit, 'xlabel')
+        self.ylabel_lineedit = self.findChild(QLineEdit, 'ylabel')
+        self.plot_title_in_lineedit = self.findChild(QLineEdit, 'plot_title_in')
+        self.cent_freq_in_lineedit = self.findChild(QLineEdit, 'cent_freq_in')
+        self.freq_span_in_lineedit = self.findChild(QLineEdit, 'freq_span_in')
 
         self.showMaximized()
 

@@ -34,6 +34,9 @@ class Test_Manager(QtCore.QObject):
     def execute_test(self):
         self.test_equipment_addr = {}
         test_equipment_list = self.test_model.get_test_equipment_list(self.selectedTest)
+        if len(test_equipment_list) == 0:
+            #Error: empty test
+            raise Exception("No equipment configured")
         for equipment in test_equipment_list:
             addr = self.equipment_model.get_equipment_address(equipment)
             self.test_equipment_addr[equipment] = addr
@@ -116,6 +119,7 @@ class Test_Manager(QtCore.QObject):
 
     def abort_test(self):
         print("Main thread aborting test", threading.get_ident())
+        self.timer.setInterval(0)
         for equipment in self.test_model.get_test_equipment_list(self.selectedTest):
             self.worker_pool.get_worker(self.test_equipment_addr[equipment]).signal_stop.emit()
 
