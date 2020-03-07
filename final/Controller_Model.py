@@ -55,7 +55,7 @@ class Controller_Model(QtCore.QObject):
         self.slot_change_selected_test(0)
 
     def add_new_command(self, command, commandName):
-        self.test_model.append_new_command(self.selectedTest, self.selectedEquipment, self.selectedPhase, commandName, command)
+        self.test_model.append_new_command(self.selectedTest, self.selectedEquipment, self.selectedPhase, commandName, command, [])
 
 
     def get_configured_equipment_command_list(self):
