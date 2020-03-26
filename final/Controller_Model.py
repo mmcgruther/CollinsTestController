@@ -31,6 +31,8 @@ class Controller_Model(QtCore.QObject):
         self.selectedTest = None
         self.selectedEquipment = None
         self.selectedPhase = None
+        self.pin_filename = None
+        self.ploss_filename = None
         self.default_test_selection()
         self.ip_table_model = IP_Table_Model.IP_Table_Model(self, self.equipment_model.get_IP_table_data())
         self.phase_list = ['config','run','reset']
@@ -118,7 +120,7 @@ class Controller_Model(QtCore.QObject):
             print(e)
         else:
             test_output_params = self.get_test_lineedits()
-            self.output_manager.init_output(test_output_params)
+            self.output_manager.init_output(test_output_params, self.pin_filename, self.ploss_filename)
             self.signal_set_refresh_button.emit(False)
             self.signal_set_execute_button.emit(False)
             self.signal_set_abort_button.emit(True)
@@ -170,7 +172,10 @@ class Controller_Model(QtCore.QObject):
         self.signal_set_equipment_combobox.emit(True)
     
     def set_pin_filename(self, filename):
-        self.pin_filename = filename
+        self.pin_filename = filename[0]
+
+    def set_ploss_filename(self, filename):
+        self.ploss_filename = filename[0]
 
     def get_IP_table_model(self):
         return self.ip_table_model

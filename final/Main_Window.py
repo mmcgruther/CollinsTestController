@@ -77,6 +77,9 @@ class Main_Window(QMainWindow):
         self.pin_button = self.findChild(QPushButton, 'pin_button')
         self.pin_button.clicked.connect(self.slot_open_pin_dialog)
 
+        self.pin_button = self.findChild(QPushButton, 'ploss_button')
+        self.pin_button.clicked.connect(self.slot_open_ploss_dialog)
+
         self.action_new_test = self.findChild(QAction, 'action_new_test')
         self.action_new_test.triggered.connect(self.slot_add_new_test)
 
@@ -177,7 +180,11 @@ class Main_Window(QMainWindow):
 
     @QtCore.pyqtSlot()
     def slot_open_pin_dialog(self):
-        self.controller_model.set_pin_filename(QFileDialog.getOpenFileName(self,"Open file","~","CSV File (*.csv)"))
+        self.controller_model.set_pin_filename(QFileDialog.getOpenFileName(self,"Open Power In file","~","CSV File (*.csv)"))
+
+    @QtCore.pyqtSlot()
+    def slot_open_ploss_dialog(self):
+        self.controller_model.set_ploss_filename(QFileDialog.getOpenFileName(self,"Open Power Loss file","~","CSV File (*.csv)"))
 
     @QtCore.pyqtSlot()
     def slot_open_equipment_gui(self):
