@@ -131,9 +131,9 @@ class Controller_Model(QtCore.QObject):
         line_dict = {}
         line_dict["xlabel"] = self.parent.xlabel_lineedit.text()
         line_dict["ylabel"] = self.parent.ylabel_lineedit.text()
-        line_dict["plot_title_in_lineedit"] = self.parent.plot_title_in_lineedit.text()
-        line_dict["cent_freq_in_lineedit"] = self.parent.cent_freq_in_lineedit.text()
-        line_dict["freq_span_in_lineedit"] = self.parent.freq_span_in_lineedit.text()
+        line_dict["plot_title"] = self.parent.plot_title_in_lineedit.text()
+        line_dict["cent_freq"] = self.parent.cent_freq_in_lineedit.text()
+        line_dict["freq_span"] = self.parent.freq_span_in_lineedit.text()
         return line_dict
 
     @QtCore.pyqtSlot()

@@ -10,19 +10,19 @@ class Output_Manager(QtCore.QObject):
         self.parent = parent
         self.df = pd.DataFrame({})
 
-        self.xlabel = self.findChild(QLineEdit, 'xlabel')
-
     signal_update_canvas = QtCore.pyqtSignal(object)
 
-    def init_output(self, params):
+    def init_output(self, params,pin_file, ploss_file):
         #params is a dictionary of text from GUI line edits. Ie: params["xlabel"]
         self.params = params
+        self.pin_file = pin_file
+        self.ploss_file = ploss_file 
         self.plot_data = []
         self.df = pd.DataFrame(columns=["Peak Frequency", "Peak Amplitude"])
         self.figure = plt.gcf()
         self.subplot1 = self.figure.add_subplot(211)
         self.subplot2 = self.figure.add_subplot(212)
-
+        print(self.params)
     """def draw_table(self, colnames, colval):
         data_1 = {}
         n=0
@@ -53,6 +53,16 @@ class Output_Manager(QtCore.QObject):
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split[1:])))
             self.subplot1.plot(data_array)
+            start = int(self.params['cent_freq'])-0.5*int(self.params['freq_span'])
+            stop =  int(self.params['cent_freq'])+0.5*int(self.params['freq_span'])
+            self.subplot1.set_xlim(start, stop)
+            for i in self.params:
+                if(i=='xlabel'):
+                    self.subplot1.set_xlabel(self.params[i])
+                if(i=='ylabel'):
+                    self.subplot1.set_ylabel(self.params[i])
+                if(i=='plot_title'):
+                    self.subplot1.set_title(self.params[i])
             self.plot_data.append(data_array)
 
         if qID == 1:

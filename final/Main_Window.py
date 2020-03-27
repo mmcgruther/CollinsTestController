@@ -77,8 +77,8 @@ class Main_Window(QMainWindow):
         self.pin_button = self.findChild(QPushButton, 'pin_button')
         self.pin_button.clicked.connect(self.slot_open_pin_dialog)
 
-        self.pin_button = self.findChild(QPushButton, 'ploss_button')
-        self.pin_button.clicked.connect(self.slot_open_ploss_dialog)
+        self.ploss_button = self.findChild(QPushButton, 'ploss_button')
+        self.ploss_button.clicked.connect(self.slot_open_ploss_dialog)
 
         self.action_new_test = self.findChild(QAction, 'action_new_test')
         self.action_new_test.triggered.connect(self.slot_add_new_test)
