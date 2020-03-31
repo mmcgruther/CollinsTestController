@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from PyQt5 import QtCore, QtGui
 from csv import writer 
+from csv import reader
 from PyQt5.QtWidgets import QLineEdit
 class Output_Manager(QtCore.QObject):
     def __init__(self, parent):
@@ -15,31 +16,40 @@ class Output_Manager(QtCore.QObject):
     def init_output(self, params,pin_file, ploss_file):
         #params is a dictionary of text from GUI line edits. Ie: params["xlabel"]
         self.params = params
-        self.pin_file = pin_file
-        self.ploss_file = ploss_file 
+        self.pin_file = pin_file#Pin file name 
+        self.ploss_file = ploss_file #Ploss file name
         self.plot_data = []
-        self.df = pd.DataFrame(columns=["Peak Frequency", "Peak Amplitude"])
+        self.df = pd.DataFrame(columns=["Peak Frequency(MHz)", "Peak Amplitude"])
         self.figure = plt.gcf()
         self.subplot1 = self.figure.add_subplot(211)
         self.subplot2 = self.figure.add_subplot(212)
-        print(self.params)
-    """def draw_table(self, colnames, colval):
-        data_1 = {}
-        n=0
-        for c in colnames:
-            data_1[c] = colval[n]
-            n=n+1
+        self.a = 0
+        
+        
+    
+    def parse_pin(self):
+        arr = []
+        with open(self.pin_file, newline='') as csv_file:
+            pin_vals = reader(csv_file, delimiter='\n')
+            for vals in pin_vals:
+                strings = [str(lilval) for lilval in vals]
+                a_string = "".join(strings)
+                an_integer = int(a_string)
+                arr.append(an_integer)
+        return arr       
 
-        df1 = pd.DataFrame(data_1)
-        self.df = self.df.append(df1, ignore_index = True)
+    def parse_ploss(self):
+        arr = []
+        with open(self.ploss_file, newline='') as csv_file:
+            ploss_vals = reader(csv_file, delimiter='\n')
+            for vals in ploss_vals:
+                strings = [str(lilval) for lilval in vals]
+                a_string = "".join(strings)
+                an_integer = int(a_string)
+                arr.append(an_integer)
+        return arr       
+        
 
-        return self.df
-
-    def draw_plot(self, colnames, xval,data_val):
-        plt.plot(xval,data_val)
-        plt.xlabel(colnames[0])
-        plt.ylabel(colnames[1])
-        plt.show()"""
     
     def save_data(self,file_name, final): #pass the dic final to this function after last call
         #final.to_csv(r'C:\Users\Demilade\Documents\4806\test1.csv')
@@ -52,9 +62,11 @@ class Output_Manager(QtCore.QObject):
             self.subplot1.cla()
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split[1:])))
-            self.subplot1.plot(data_array)
-            start = int(self.params['cent_freq'])-0.5*int(self.params['freq_span'])
-            stop =  int(self.params['cent_freq'])+0.5*int(self.params['freq_span'])
+            start = (int(self.params['cent_freq'])-0.5*int(self.params['freq_span'])) * 10**6
+            stop =  (int(self.params['cent_freq'])+0.5*int(self.params['freq_span'])) * 10**6
+            step = (stop-start)/len(data_array)
+            x = np.arange(start, stop, step)
+            self.subplot1.plot(x,data_array)
             self.subplot1.set_xlim(start, stop)
             for i in self.params:
                 if(i=='xlabel'):
@@ -69,7 +81,14 @@ class Output_Manager(QtCore.QObject):
             self.subplot2.cla()
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split)))
-            table = pd.DataFrame({"Peak Frequency": [data_array[0]], "Peak Amplitude": [data_array[1]]})
+            #adding the power loss values to the Pout
+            arr = self.parse_ploss()
+            arr2 = self.parse_pin()
+            data_array[1] = data_array[1]+arr[self.a]
+            data_array[0] = data_array[0]/1000000
+            self.a = self.a + 1
+            #creating the output table with necessary columns
+            table = pd.DataFrame({"Power In": [arr2[self.a]], "Peak Frequency(MHz)": [data_array[0]], "Peak Amplitude": [data_array[1]]})
             self.df = self.df.append(table, ignore_index=True)
 
             #print(self.df)
