@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog, QVBoxLayout, QLineEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog, QVBoxLayout, QLineEdit, QStatusBar
 from final import Controller_Model, Equipment_Window
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -23,12 +23,18 @@ class Main_Window(QMainWindow):
         self.controller_model.signal_set_equipment_list.connect(self.slot_set_equipment_list)
         self.controller_model.signal_set_phase_list.connect(self.slot_set_phase_list)
 
+        self.controller_model.signal_set_pin_button_label.connect(self.slot_set_pin_button_label)
+        self.controller_model.signal_set_ploss_button_label.connect(self.slot_set_ploss_button_label)
+
         self.initUI()
         self.controller_model.initialize_view()
 
     def initUI(self):
         """Lay out main window"""
         uic.loadUi('final/Main_Window.ui', self)
+
+        self.statusbar = self.findChild(QStatusBar, 'statusbar')
+        self.controller_model.signal_status_message.connect(self.statusbar.showMessage)
 
         self.refresh_button = self.findChild(QPushButton, 'refresh_button')
         self.refresh_button.clicked.connect(self.controller_model.list_resources)
@@ -192,6 +198,10 @@ class Main_Window(QMainWindow):
         self.dialog.signal_set_gui_commands.connect(self.controller_model.slot_set_test_commands)
         self.dialog.show()
         
+    @QtCore.pyqtSlot(str)
+    def slot_set_pin_button_label(self, label):
+        self.pin_button.setText(label)
 
-
-        
+    @QtCore.pyqtSlot(str)
+    def slot_set_ploss_button_label(self, label):
+        self.ploss_button.setText(label)
