@@ -19,10 +19,11 @@ class Output_Manager(QtCore.QObject):
         self.pin_file = pin_file#Pin file name 
         self.ploss_file = ploss_file #Ploss file name
         self.plot_data = []
-        self.df = pd.DataFrame(columns=["Peak Frequency(MHz)", "Peak Amplitude"])
+        #self.df = pd.DataFrame(columns=["Peak Frequency(MHz)", "Peak Amplitude"])
         self.figure = plt.gcf()
         self.subplot1 = self.figure.add_subplot(211)
         self.subplot2 = self.figure.add_subplot(212)
+       # self.subplot3 = self.figure.add_subplot(213)
         self.a = 0
         
         
@@ -34,7 +35,22 @@ class Output_Manager(QtCore.QObject):
             for vals in pin_vals:
                 strings = [str(lilval) for lilval in vals]
                 a_string = "".join(strings)
-                an_integer = int(a_string)
+                a_string = a_string.split(',')
+                #print(a_string[0])
+                an_integer = int(a_string[1])
+                arr.append(an_integer)
+        return arr 
+
+    def parse_freq(self):
+        arr = []
+        with open(self.pin_file, newline='') as csv_file:
+            pin_vals = reader(csv_file, delimiter='\n')
+            for vals in pin_vals:
+                strings = [str(lilval) for lilval in vals]
+                a_string = "".join(strings)
+                a_string = a_string.split(',')
+                #print(a_string[0])
+                an_integer = int(a_string[0])
                 arr.append(an_integer)
         return arr       
 
@@ -51,7 +67,7 @@ class Output_Manager(QtCore.QObject):
         
 
     
-    def save_data(self,file_name, final): #pass the dic final to this function after last call
+    def save_data(self,file_name, final): #pass the dictionary final to this function after last call
         #final.to_csv(r'C:\Users\Demilade\Documents\4806\test1.csv')
         with open(file_name, 'a+', newline='') as write_obj:
             csv_writer = writer(write_obj)
@@ -82,21 +98,24 @@ class Output_Manager(QtCore.QObject):
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split)))
             #adding the power loss values to the Pout
-            arr = self.parse_ploss()
-            arr2 = self.parse_pin()
-            data_array[1] = data_array[1]+arr[self.a]
+            p_loss = self.parse_ploss()
+            p_in = self.parse_pin()
+            freq = self.parse_freq()
+            p_meas = data_array[1]
+            p_out = data_array[1]+p_loss[self.a]#peak amplitude
+            p_in_out = p_in[self.a]-p_out
             data_array[0] = data_array[0]/1000000
             self.a = self.a + 1
             #creating the output table with necessary columns
-            table = pd.DataFrame({"Power In": [arr2[self.a]], "Peak Frequency(MHz)": [data_array[0]], "Peak Amplitude": [data_array[1]]})
+            table = pd.DataFrame({"Peak Frequency(MHz)": [freq[self.a]], "Power In(dB)": [p_in[self.a]],"Power Measured(dB)": [p_meas], "Power Loss": [p_loss[self.a]],  "Peak Amplitude(dB)": [p_out], "Pin-Pout": [p_in_out]})
+            self.save_data('power_out.csv', table)
             self.df = self.df.append(table, ignore_index=True)
 
-            #print(self.df)
             cell_text = []
             for row in range(len(self.df)):
                 cell_text.append(self.df.iloc[row])
             self.subplot2.table(cellText=cell_text, colLabels=self.df.columns, loc='center')
             self.subplot2.axis('off')
-
+        
         self.signal_update_canvas.emit(self.figure)
     

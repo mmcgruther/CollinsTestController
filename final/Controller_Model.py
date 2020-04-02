@@ -120,7 +120,7 @@ class Controller_Model(QtCore.QObject):
         self.test_manager = Test_Manager(self, self.test_model, self.equipment_model, self.worker_pool, self.selectedTest)
         try:
             if self.pin_filename is None:
-                raise RuntimeError("No 'Power In' file selected")
+                raise RuntimeError("No 'Input' file selected")
             if self.ploss_filename is None:
                 raise RuntimeError("No 'Power Loss' file selected")
             test_output_params = self.get_test_lineedits()
@@ -190,7 +190,7 @@ class Controller_Model(QtCore.QObject):
     
     def set_pin_filename(self, filename):
         self.pin_filename = filename[0]
-        self.signal_set_pin_button_label.emit("Selected Power In: " + os.path.basename(self.pin_filename))
+        self.signal_set_pin_button_label.emit("Selected Input File: " + os.path.basename(self.pin_filename))
 
     def set_ploss_filename(self, filename):
         self.ploss_filename = filename[0]
