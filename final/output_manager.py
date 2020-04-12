@@ -5,6 +5,8 @@ from PyQt5 import QtCore, QtGui
 from csv import writer 
 from csv import reader
 from PyQt5.QtWidgets import QLineEdit
+
+
 class Output_Manager(QtCore.QObject):
     def __init__(self, parent):
         super(Output_Manager, self).__init__()
@@ -13,21 +15,26 @@ class Output_Manager(QtCore.QObject):
 
     signal_update_canvas = QtCore.pyqtSignal(object)
 
+    #This function initializes the parameters needed
+    #for drawing tables and plotting graphs. 
     def init_output(self, params,pin_file, ploss_file):
         #params is a dictionary of text from GUI line edits. Ie: params["xlabel"]
         self.params = params
-        self.pin_file = pin_file#Pin file name 
-        self.ploss_file = ploss_file #Ploss file name
+        self.pin_file = pin_file#Input file name 
+        self.ploss_file = ploss_file #Power loss file name
         self.plot_data = []
-        #self.df = pd.DataFrame(columns=["Peak Frequency(MHz)", "Peak Amplitude"])
         self.figure = plt.gcf()
-        self.subplot1 = self.figure.add_subplot(211)
-        self.subplot2 = self.figure.add_subplot(212)
-       # self.subplot3 = self.figure.add_subplot(213)
+        self.subplot1 = self.figure.add_subplot(311)
+        self.subplot2 = self.figure.add_subplot(312)
+        self.subplot3 = self.figure.add_subplot(313)
         self.a = 0
+        self.arr1 = []
+        self.arr2 = []
         
         
-    
+    #This function parses the Power in values from the input
+    #value files, converts the string values to integers
+    #and returns an array of the Power In integers
     def parse_pin(self):
         arr = []
         with open(self.pin_file, newline='') as csv_file:
@@ -41,6 +48,9 @@ class Output_Manager(QtCore.QObject):
                 arr.append(an_integer)
         return arr 
 
+    #This function parses the Frequency values from the input
+    #value files, converts the string values to integers
+    #and returns an array('arr') of the Frequency integers
     def parse_freq(self):
         arr = []
         with open(self.pin_file, newline='') as csv_file:
@@ -49,11 +59,13 @@ class Output_Manager(QtCore.QObject):
                 strings = [str(lilval) for lilval in vals]
                 a_string = "".join(strings)
                 a_string = a_string.split(',')
-                #print(a_string[0])
                 an_integer = int(a_string[0])
                 arr.append(an_integer)
         return arr       
 
+    #This function parses the Power loss values from the power loss
+    #values file, converts the string values to integers
+    #and returns an array of the Power Loss integers
     def parse_ploss(self):
         arr = []
         with open(self.ploss_file, newline='') as csv_file:
@@ -65,19 +77,26 @@ class Output_Manager(QtCore.QObject):
                 arr.append(an_integer)
         return arr       
         
-
-    
-    def save_data(self,file_name, final): #pass the dictionary final to this function after last call
-        #final.to_csv(r'C:\Users\Demilade\Documents\4806\test1.csv')
+    #this function saves the data from the created table to 
+    #a .csv file
+    def save_data(self,file_name, final):
         with open(file_name, 'a+', newline='') as write_obj:
             csv_writer = writer(write_obj)
             csv_writer.writerow(final)
 
+    #this is the main output configuration function.When qID = 0 
+    #the function receives all the data points that the equipment 
+    #sends and plots it on the GUI output section.
+    #When qID = 1, The function fills a table with the peak output
+    # values and their corresponding frequencies that the test equipment sends.
+    #These peak output values are saved to the output .csv file. 
     def update_output(self, str_data, addr, qID):
         if qID == 0:
             self.subplot1.cla()
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split[1:])))
+            #using the input parameters from the GUI to configure the 
+            #axis of the plot
             start = (int(self.params['cent_freq'])-0.5*int(self.params['freq_span'])) * 10**6
             stop =  (int(self.params['cent_freq'])+0.5*int(self.params['freq_span'])) * 10**6
             step = (stop-start)/len(data_array)
@@ -95,27 +114,32 @@ class Output_Manager(QtCore.QObject):
 
         if qID == 1:
             self.subplot2.cla()
+            self.subplot3.cla()
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split)))
             #adding the power loss values to the Pout
             p_loss = self.parse_ploss()
             p_in = self.parse_pin()
             freq = self.parse_freq()
-            p_meas = data_array[1]
-            p_out = data_array[1]+p_loss[self.a]#peak amplitude
+            p_meas = data_array[1] #measured power out
+            p_out = p_meas + p_loss[self.a]#peak amplitude
             p_in_out = p_in[self.a]-p_out
             data_array[0] = data_array[0]/1000000
-            self.a = self.a + 1
             #creating the output table with necessary columns
             table = pd.DataFrame({"Peak Frequency(MHz)": [freq[self.a]], "Power In(dB)": [p_in[self.a]],"Power Measured(dB)": [p_meas], "Power Loss": [p_loss[self.a]],  "Peak Amplitude(dB)": [p_out], "Pin-Pout": [p_in_out]})
-            self.save_data('power_out.csv', table)
+            self.save_data('power_out.csv', table.values)
             self.df = self.df.append(table, ignore_index=True)
-
             cell_text = []
             for row in range(len(self.df)):
                 cell_text.append(self.df.iloc[row])
             self.subplot2.table(cellText=cell_text, colLabels=self.df.columns, loc='center')
             self.subplot2.axis('off')
-        
+            self.arr1.append(p_in[self.a])
+            self.arr2.append(p_out)
+            self.subplot3.plot(self.arr1,self.arr2)
+            if(freq[self.a] != freq[self.a-1]):
+                self.subplot3.plot(self.arr1, self.arr2, color='g')
+            self.a = self.a + 1
+
         self.signal_update_canvas.emit(self.figure)
     
