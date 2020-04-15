@@ -30,6 +30,7 @@ class Output_Manager(QtCore.QObject):
         self.a = 0
         self.arr1 = []
         self.arr2 = []
+        self.df = pd.DataFrame({})
         
         
     #This function parses the Power in values from the input
@@ -114,7 +115,7 @@ class Output_Manager(QtCore.QObject):
 
         if qID == 1:
             self.subplot2.cla()
-            self.subplot3.cla()
+            #self.subplot3.cla()
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split)))
             #adding the power loss values to the Pout
@@ -134,11 +135,15 @@ class Output_Manager(QtCore.QObject):
                 cell_text.append(self.df.iloc[row])
             self.subplot2.table(cellText=cell_text, colLabels=self.df.columns, loc='center')
             self.subplot2.axis('off')
+
+            if(freq[self.a] != freq[self.a-1]):
+                self.arr1.clear()
+                self.arr2.clear()
+
             self.arr1.append(p_in[self.a])
             self.arr2.append(p_out)
             self.subplot3.plot(self.arr1,self.arr2)
-            if(freq[self.a] != freq[self.a-1]):
-                self.subplot3.plot(self.arr1, self.arr2, color='g')
+            self.subplot3.plot(self.arr1, self.arr2)
             self.a = self.a + 1
 
         self.signal_update_canvas.emit(self.figure)
