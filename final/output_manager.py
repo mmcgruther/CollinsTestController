@@ -31,6 +31,7 @@ class Output_Manager(QtCore.QObject):
         self.arr1 = []
         self.arr2 = []
         self.df = pd.DataFrame({})
+        self.subplot3.cla()
         
         
     #This function parses the Power in values from the input
@@ -98,8 +99,8 @@ class Output_Manager(QtCore.QObject):
             data_array = np.array(list(map(float, data_split[1:])))
             #using the input parameters from the GUI to configure the 
             #axis of the plot
-            start = (int(self.params['cent_freq'])-0.5*int(self.params['freq_span'])) * 10**6
-            stop =  (int(self.params['cent_freq'])+0.5*int(self.params['freq_span'])) * 10**6
+            start = (int(self.params['cent_freq'])-0.5*int(self.params['freq_span'])) * 10**6#start frequency in MHz
+            stop =  (int(self.params['cent_freq'])+0.5*int(self.params['freq_span'])) * 10**6#stop  frequency in MHz
             step = (stop-start)/len(data_array)
             x = np.arange(start, stop, step)
             self.subplot1.plot(x,data_array)
@@ -115,7 +116,6 @@ class Output_Manager(QtCore.QObject):
 
         if qID == 1:
             self.subplot2.cla()
-            #self.subplot3.cla()
             data_split = str_data.split(',')
             data_array = np.array(list(map(float, data_split)))
             #adding the power loss values to the Pout
@@ -136,14 +136,28 @@ class Output_Manager(QtCore.QObject):
             self.subplot2.table(cellText=cell_text, colLabels=self.df.columns, loc='center')
             self.subplot2.axis('off')
 
+            #creating Pin vs Pout plot with a legend and axes labels for different frequencies 
+            last_color = None
+
             if(freq[self.a] != freq[self.a-1]):
                 self.arr1.clear()
                 self.arr2.clear()
+            elif self.a != 0:
+                last_color = self.lastline.get_color()
+                self.subplot3.lines.remove(self.lastline)
 
             self.arr1.append(p_in[self.a])
             self.arr2.append(p_out)
-            self.subplot3.plot(self.arr1,self.arr2)
-            self.subplot3.plot(self.arr1, self.arr2)
+            
+            self.lastline, = self.subplot3.plot(self.arr1, self.arr2)
+            if last_color is not None:
+                self.lastline.set_color(last_color)
+            self.lastline.set_label(str(freq[self.a])+" MHz")
+            self.subplot3.legend()
+
+            self.subplot3.set_xlabel('Power In(dB)')
+            self.subplot3.set_ylabel('Power Out(dB)')
+            self.subplot3.set_title('Plot of Power In vs Power Out values')
             self.a = self.a + 1
 
         self.signal_update_canvas.emit(self.figure)

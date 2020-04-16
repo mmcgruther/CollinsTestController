@@ -259,7 +259,7 @@
         <item>
          <widget class="QPushButton" name="pin_button">
           <property name="text">
-           <string>Choose &quot;Power In&quot; File</string>
+           <string>Choose &quot;Input&quot; File</string>
           </property>
          </widget>
         </item>
