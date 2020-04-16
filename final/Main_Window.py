@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, uic, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton, QWidget, QTableView, QTreeView, QComboBox, QGraphicsView, QGraphicsScene, QFileDialog, QAction, QInputDialog, QDialog, QVBoxLayout, QLineEdit, QStatusBar
 from final import Controller_Model, Equipment_Window
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -23,12 +23,18 @@ class Main_Window(QMainWindow):
         self.controller_model.signal_set_equipment_list.connect(self.slot_set_equipment_list)
         self.controller_model.signal_set_phase_list.connect(self.slot_set_phase_list)
 
+        self.controller_model.signal_set_pin_button_label.connect(self.slot_set_pin_button_label)
+        self.controller_model.signal_set_ploss_button_label.connect(self.slot_set_ploss_button_label)
+
         self.initUI()
         self.controller_model.initialize_view()
 
     def initUI(self):
         """Lay out main window"""
         uic.loadUi('final/Main_Window.ui', self)
+
+        self.statusbar = self.findChild(QStatusBar, 'statusbar')
+        self.controller_model.signal_status_message.connect(self.statusbar.showMessage)
 
         self.refresh_button = self.findChild(QPushButton, 'refresh_button')
         self.refresh_button.clicked.connect(self.controller_model.list_resources)
@@ -77,6 +83,9 @@ class Main_Window(QMainWindow):
         self.pin_button = self.findChild(QPushButton, 'pin_button')
         self.pin_button.clicked.connect(self.slot_open_pin_dialog)
 
+        self.ploss_button = self.findChild(QPushButton, 'ploss_button')
+        self.ploss_button.clicked.connect(self.slot_open_ploss_dialog)
+
         self.action_new_test = self.findChild(QAction, 'action_new_test')
         self.action_new_test.triggered.connect(self.slot_add_new_test)
 
@@ -88,6 +97,12 @@ class Main_Window(QMainWindow):
 
         self.action_exit = self.findChild(QAction, 'action_exit')
         self.action_exit.triggered.connect(self.close)
+
+        self.xlabel_lineedit = self.findChild(QLineEdit, 'xlabel')
+        self.ylabel_lineedit = self.findChild(QLineEdit, 'ylabel')
+        self.plot_title_in_lineedit = self.findChild(QLineEdit, 'plot_title_in')
+        self.cent_freq_in_lineedit = self.findChild(QLineEdit, 'cent_freq_in')
+        self.freq_span_in_lineedit = self.findChild(QLineEdit, 'freq_span_in')
 
         self.showMaximized()
 
@@ -171,7 +186,11 @@ class Main_Window(QMainWindow):
 
     @QtCore.pyqtSlot()
     def slot_open_pin_dialog(self):
-        self.controller_model.set_pin_filename(QFileDialog.getOpenFileName(self,"Open file","~","CSV File (*.csv)"))
+        self.controller_model.set_pin_filename(QFileDialog.getOpenFileName(self,"Open Power In file","~","CSV File (*.csv)"))
+
+    @QtCore.pyqtSlot()
+    def slot_open_ploss_dialog(self):
+        self.controller_model.set_ploss_filename(QFileDialog.getOpenFileName(self,"Open Power Loss file","~","CSV File (*.csv)"))
 
     @QtCore.pyqtSlot()
     def slot_open_equipment_gui(self):
@@ -179,6 +198,10 @@ class Main_Window(QMainWindow):
         self.dialog.signal_set_gui_commands.connect(self.controller_model.slot_set_test_commands)
         self.dialog.show()
         
+    @QtCore.pyqtSlot(str)
+    def slot_set_pin_button_label(self, label):
+        self.pin_button.setText(label)
 
-
-        
+    @QtCore.pyqtSlot(str)
+    def slot_set_ploss_button_label(self, label):
+        self.ploss_button.setText(label)

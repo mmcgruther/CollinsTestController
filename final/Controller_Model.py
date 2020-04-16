@@ -4,7 +4,7 @@ from final.connection_manager import Connection_Manager
 from final.worker_pool import Worker_Pool
 from final.test_manager import Test_Manager
 from final.output_manager import Output_Manager
-import json, threading
+import json, threading, os
 
 
 """
@@ -31,10 +31,14 @@ class Controller_Model(QtCore.QObject):
         self.selectedTest = None
         self.selectedEquipment = None
         self.selectedPhase = None
+        self.pin_filename = None
+        self.ploss_filename = None
         self.default_test_selection()
         self.ip_table_model = IP_Table_Model.IP_Table_Model(self, self.equipment_model.get_IP_table_data())
         self.phase_list = ['config','run','reset']
+        self.parent=parent
 
+    signal_status_message = QtCore.pyqtSignal(str, int)
 
     signal_set_refresh_button = QtCore.pyqtSignal(bool)
     signal_set_execute_button = QtCore.pyqtSignal(bool)
@@ -49,6 +53,9 @@ class Controller_Model(QtCore.QObject):
 
     signal_set_test_index = QtCore.pyqtSignal(int)
     signal_set_equipment_index = QtCore.pyqtSignal(int)
+
+    signal_set_pin_button_label = QtCore.pyqtSignal(str)
+    signal_set_ploss_button_label = QtCore.pyqtSignal(str)
 
     def initialize_view(self):
         self.signal_set_test_list.emit(self.test_model.get_test_list())
@@ -112,16 +119,39 @@ class Controller_Model(QtCore.QObject):
         """Starts sending test commands to workers"""
         self.test_manager = Test_Manager(self, self.test_model, self.equipment_model, self.worker_pool, self.selectedTest)
         try:
+            if self.pin_filename is None:
+                raise RuntimeError("No 'Input' file selected")
+            if self.ploss_filename is None:
+                raise RuntimeError("No 'Power Loss' file selected")
+            test_output_params = self.get_test_lineedits()
             self.test_manager.execute_test()
-        except Exception as  e:
+        except Exception as e:
             print(e)
+            self.signal_status_message.emit(e.__str__(), 5000)
         else:
-            self.output_manager.init_output()
+            self.output_manager.init_output(test_output_params, self.pin_filename, self.ploss_filename)
             self.signal_set_refresh_button.emit(False)
             self.signal_set_execute_button.emit(False)
             self.signal_set_abort_button.emit(True)
             self.signal_set_test_combobox.emit(False)
             self.signal_set_equipment_combobox.emit(False)
+
+    def get_test_lineedits(self):
+        line_dict = {}
+        line_dict["xlabel"] = self.parent.xlabel_lineedit.text()
+        line_dict["ylabel"] = self.parent.ylabel_lineedit.text()
+        line_dict["plot_title"] = self.parent.plot_title_in_lineedit.text()
+        line_dict["cent_freq"] = self.parent.cent_freq_in_lineedit.text()
+        line_dict["freq_span"] = self.parent.freq_span_in_lineedit.text()
+        try:
+            int(line_dict["cent_freq"])
+        except:
+            raise RuntimeError("Invalid center frequency")
+        try:
+            int(line_dict["freq_span"])
+        except:
+            raise RuntimeError("Invalid frequency span")
+        return line_dict
 
     @QtCore.pyqtSlot()
     def abort_test(self):
@@ -159,7 +189,12 @@ class Controller_Model(QtCore.QObject):
         self.signal_set_equipment_combobox.emit(True)
     
     def set_pin_filename(self, filename):
-        self.pin_filename = filename
+        self.pin_filename = filename[0]
+        self.signal_set_pin_button_label.emit("Selected Input File: " + os.path.basename(self.pin_filename))
+
+    def set_ploss_filename(self, filename):
+        self.ploss_filename = filename[0]
+        self.signal_set_ploss_button_label.emit("Selected Power Loss: " + os.path.basename(self.ploss_filename))
 
     def get_IP_table_model(self):
         return self.ip_table_model
