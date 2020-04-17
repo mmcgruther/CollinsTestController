@@ -22,9 +22,13 @@ class Connection_Manager(QtCore.QObject):
         self.worker_pool = worker_pool
 
     def list_resources(self):
-        """On first call, starts workers for each address.
+        """
+        Initiates establishing connections to configured equipment.
+
+        On first call, starts workers for each address.
         Begin queries for each worker to identify connected equipment.
-        Disables refresh button until queries completed"""
+        Disables refresh button until queries completed
+        """
         self.workersResponded = 0
         print("Main thread", threading.get_ident())
 
@@ -46,6 +50,12 @@ class Connection_Manager(QtCore.QObject):
         self.worker_pool.set_init(True)
 
     def next_connection(self, addr):
+        """
+        Triggers connection attempt to next equipment configured for an IP address.
+
+        Subsequent calls iterate to next possible equipment.
+        If no more equipment, returns True
+        """
         self.equipment_model.set_connected(addr, 2)
         if not self.equipment_model.increment_equipment(addr):
             self.equipment_model.get_equipment_idn_cmd(addr)
@@ -59,6 +69,9 @@ class Connection_Manager(QtCore.QObject):
             return True
     
     def connection_responded(self):
+        """
+        Keeps track of how many workers have completed, indicating when connection is complete
+        """
         complete = False
         self.workersResponded += 1
         if self.workersResponded == len(self.equipment_model.get_addr_list()):
@@ -67,6 +80,9 @@ class Connection_Manager(QtCore.QObject):
 
     @QtCore.pyqtSlot(str, str)
     def slot_connected(self, addr, name):
+        """
+        Called by worker's query response, determines if connection was successful.
+        """
         if name == self.equipment_model.get_equipment_idn(addr):
             print(addr, ": Connected to ", name)
             self.equipment_model.set_connected(addr, 1)
@@ -80,6 +96,9 @@ class Connection_Manager(QtCore.QObject):
         
     @QtCore.pyqtSlot(str)
     def slot_not_connected(self, addr):
+        """
+        Called by worker's query response when nothing was received
+        """
         if self.next_connection(addr):
             self.connection_responded()
         else:

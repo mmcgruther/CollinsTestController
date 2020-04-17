@@ -3,6 +3,9 @@ import json
 
 class Test_Model(QtCore.QAbstractTableModel):
     """
+    Object handles loading test json configuration file, get/set test equipment/commands/parameters
+
+    DICT STRUCTURE
     data:
     {
         "test":

@@ -4,6 +4,10 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtTest import QTest
 from PyQt5.QtCore import Qt
 
+"""
+Script file runs automated unit test cases with simulated equipment and dummy equipment/test json files
+"""
+
 app = QApplication(sys.argv)
 
 class Controller_Test(unittest.TestCase):

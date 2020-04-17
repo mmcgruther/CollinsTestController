@@ -8,6 +8,10 @@ import sys, time, json
 import pandas as pd
 
 class Main_Window(QMainWindow):
+    """
+    Top level object. Uses controller_model object to handle software logic. Makes Qt signal/slot connections between UI elements and their 
+    functionality in controller_model
+    """
     def __init__(self, equipment_file = "equipment.json", tests_file = "tests.json", backend = "@py"):
         super(Main_Window, self).__init__()
         self.controller_model = Controller_Model.Controller_Model(self, equipment_file, tests_file, backend)
@@ -30,7 +34,7 @@ class Main_Window(QMainWindow):
         self.controller_model.initialize_view()
 
     def initUI(self):
-        """Lay out main window"""
+        """Defines and connects GUI elements from .ui file"""
         uic.loadUi('final/Main_Window.ui', self)
 
         self.statusbar = self.findChild(QStatusBar, 'statusbar')
@@ -67,15 +71,12 @@ class Main_Window(QMainWindow):
         self.phase_combobox.currentIndexChanged.connect(self.controller_model.slot_change_selected_phase)
 
         self.vboxlayout = self.findChild(QVBoxLayout, 'verticalLayout_3')
-        #self.graphics_view = self.findChild(QGraphicsView, 'graphics_view')
+    
         self.figure = plt.figure(facecolor='black')        
         self.figure.set_facecolor("none")
         self.canvas = FigureCanvas(self.figure)
         self.vboxlayout.addWidget(self.canvas)
-        """self.scene = QGraphicsScene(self.graphics_view)
-        self.scene.addWidget(self.canvas)
-        self.graphics_view.setScene(self.scene)
-        self.scene.setBackgroundBrush(QtCore.Qt.green)"""
+
         self.canvas.draw()
         
         self.controller_model.output_manager.signal_update_canvas.connect(self.slot_update_canvas)

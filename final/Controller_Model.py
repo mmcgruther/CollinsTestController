@@ -6,18 +6,6 @@ from final.test_manager import Test_Manager
 from final.output_manager import Output_Manager
 import json, threading, os
 
-
-"""
-TODO:
-    -Create Output Manager to format data output per test
-    -Get csv file data for output manager
-    -Create tabbed window for Test config
-
-    -Documentation
-    -Refactor Connections out of Equipment_Model
-    -Rename Controller Model?
-"""
-
 class Controller_Model(QtCore.QObject):
    
     def __init__(self, parent, equipment_file, tests_file, backend):
@@ -107,6 +95,9 @@ class Controller_Model(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def list_resources(self):
+        """
+        Triggers start of establishing equipment connections
+        """
         self.signal_set_refresh_button.emit(False)
         self.signal_set_execute_button.emit(False)
         print("Main thread", threading.get_ident())
@@ -116,7 +107,9 @@ class Controller_Model(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def slot_execute_test(self):
-        """Starts sending test commands to workers"""
+        """
+        Triggers start of test execution
+        """
         self.test_manager = Test_Manager(self, self.test_model, self.equipment_model, self.worker_pool, self.selectedTest)
         try:
             if self.pin_filename is None:

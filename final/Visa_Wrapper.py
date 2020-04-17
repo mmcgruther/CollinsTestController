@@ -1,6 +1,9 @@
 import visa
 
 class Visa_Session:
+    """
+    Module wraps VISA communication implementation.
+    """
     def __init__(self, addr, backend):
         self.addr = addr
         self.rm = visa.ResourceManager(backend)

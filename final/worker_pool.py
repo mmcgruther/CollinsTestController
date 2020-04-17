@@ -2,6 +2,9 @@ from PyQt5 import QtCore
 from final.Visa_Worker import Visa_Worker
 
 class Worker_Pool(QtCore.QObject):
+    """
+    Object creates, provides access to and cleans up worker threads for asynchronous TCP communication
+    """
    
     def __init__(self, parent, backend):
         super(Worker_Pool, self).__init__()

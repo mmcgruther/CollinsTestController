@@ -1,6 +1,10 @@
 from PyQt5 import QtCore, uic
 from PyQt5.QtWidgets import QMainWindow, QDialogButtonBox, QRadioButton, QDoubleSpinBox
 
+"""
+Module for using popup equipment config window
+"""
+
 class Equipment_Window(QMainWindow):
     def __init__(self, equipment):
         super(Equipment_Window, self).__init__()

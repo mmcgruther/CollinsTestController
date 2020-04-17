@@ -2,6 +2,9 @@ import json
 
 class Equipment_Model:
     """
+    Object handles loading equipment json configuration file, get/set equipment info
+
+    DICT STRUCTURE
     data:
     {
         addr:

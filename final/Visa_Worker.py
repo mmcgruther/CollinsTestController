@@ -4,6 +4,9 @@ import sys, time, threading
 from final.Visa_Wrapper import Visa_Session
 
 class Visa_Worker(QtCore.QObject):
+    """
+    Worker object for equipment communication.
+    """
     def __init__(self, addr, backend, *args, **kwargs):
         super(Visa_Worker, self).__init__()
         self.session = Visa_Session(addr, backend)

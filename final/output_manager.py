@@ -8,6 +8,9 @@ from PyQt5.QtWidgets import QLineEdit
 
 
 class Output_Manager(QtCore.QObject):
+    """
+    Module responsible for parsing raw data response from equipment during tests
+    """
     def __init__(self, parent):
         super(Output_Manager, self).__init__()
         self.parent = parent

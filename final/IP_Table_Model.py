@@ -1,6 +1,9 @@
 from PyQt5 import QtCore, QtGui
 
 class IP_Table_Model(QtCore.QAbstractTableModel):
+    """
+    Model used by QTableView for equipment connection info
+    """
 
     def __init__(self, parent, data, header = ['Address', 'Equipment ID'], *args):
         super(IP_Table_Model, self).__init__()

@@ -5,18 +5,10 @@ from final.worker_pool import Worker_Pool
 from final.Equipment_Model import Equipment_Model
 from final.Test_Model import Test_Model
 
-"""
-
-Functions:
-
-Signals:
-
-Slots:
-
-Variables:
-
-"""
 class Test_Manager(QtCore.QObject):
+    """
+    Manages execution of test. 
+    """
     def __init__(self, parent, test_model, equipment_model, worker_pool, selectedTest):
         super(Test_Manager, self).__init__()
         self.parent = parent
